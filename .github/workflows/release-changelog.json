@@ -1,0 +1,27 @@
+{
+    "categories": [
+      {
+        "title": "### Highlights",
+        "labels": ["Highlight"]
+      },
+      {
+        "title": "### New Rules or Profiles",
+        "labels": ["New rule/profile"]
+      },
+      {
+        "title": "### Remediations",
+        "labels": ["Ansible", "Bash"]
+      },
+      {
+        "title": "### Tests",
+        "labels": ["OVAL", "OCIL"]
+      }
+    ],
+    "sort": "ASC",
+    "template": "${{CHANGELOG}}\n\n<details>\n<summary>Misc</summary>\n\n${{UNCATEGORIZED}}\n</details>",
+    "pr_template": "- ${{TITLE}} (#${{NUMBER}})",
+    "empty_template": "- no changes",
+    "max_tags_to_fetch": 200,
+    "max_pull_requests": 2000,
+    "max_back_track_time_days": 240
+}
