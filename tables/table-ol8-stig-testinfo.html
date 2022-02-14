@@ -3494,7 +3494,9 @@ configured acceptable allowance (drift) may be inaccurate.</td>
 add the following:
 <pre>maxpoll <xccdf-1.1:sub xmlns:xccdf-1.1="http://checklists.nist.gov/xccdf/1.1" idref="var_time_service_set_maxpoll"></xccdf-1.1:sub></pre>
 to <pre>server</pre> directives. If using chrony any <pre>pool</pre> directives
-should be configured too.</td>
+should be configured too.
+If no <code>server</code> or <code>pool</code> directives are configured, the rule evaluates
+to pass.</td>
 <td></td>
 <td>SRG-OS-000355-GPOS-00143<br>SRG-OS-000356-GPOS-00144<br>
 </td>
@@ -3531,7 +3533,11 @@ to <code>1</code> in <code>/etc/yum.conf</code>.</td>
 provides a mechanism to lock sessions after period of inactivity.</td>
 <td xml:lang="en-US">The <code>tmux</code> terminal multiplexer is used to implement
 automatic session locking. It should be started from
-<code>/etc/bashrc</code>.</td>
+<code>/etc/bashrc</code> or drop-in files within <code>/etc/profile.d/</code>.
+Additionally it must be ensured that the <code>tmux</code> process is running
+and it can be verified with the following command:
+<pre>ps all | grep tmux | grep -v grep</pre>
+</td>
 <td></td>
 <td>SRG-OS-000028-GPOS-00009<br>
 </td>

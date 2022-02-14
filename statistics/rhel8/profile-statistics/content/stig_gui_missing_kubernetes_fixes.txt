@@ -114,6 +114,7 @@ auditd_data_retention_space_left_percentage
 auditd_overflow_action
 banner_etc_issue
 bios_enable_execution_restrictions
+chronyd_server_directive
 clean_components_post_updating
 configure_bashrc_exec_tmux
 configure_bind_crypto_policy

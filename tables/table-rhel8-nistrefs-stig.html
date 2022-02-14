@@ -2463,7 +2463,7 @@ The DoD STIG requirement is 5 passwords.
   <td xml:lang="en-US">
 Preventing re-use of previous passwords helps ensure that a compromised password is not re-used by a user.
   </td>
-  <td>var_password_pam_remember=5<br/>var_password_pam_remember_control_flag=required</td>
+  <td>var_password_pam_remember_control_flag=required<br/>var_password_pam_remember=5</td>
 </tr>
 <tr>
   <td>IA-5(f)<br/>IA-5(1)(e)</td>
@@ -2483,7 +2483,7 @@ The DoD STIG requirement is 5 passwords.
   <td xml:lang="en-US">
 Preventing re-use of previous passwords helps ensure that a compromised password is not re-used by a user.
   </td>
-  <td>var_password_pam_remember=5<br/>var_password_pam_remember_control_flag=required</td>
+  <td>var_password_pam_remember_control_flag=required<br/>var_password_pam_remember=5</td>
 </tr>
 <tr>
   <td>IA-5(c)<br/>IA-5(1)(a)<br/>CM-6(a)<br/>IA-5(4)</td>
@@ -3337,6 +3337,8 @@ add the following:
 <pre>maxpoll <tt>18_hours</tt></pre>
 to <pre>server</pre> directives. If using chrony any <pre>pool</pre> directives
 should be configured too.
+If no <tt>server</tt> or <tt>pool</tt> directives are configured, the rule evaluates
+to pass.
   </td>
   <td xml:lang="en-US">
 Inaccurate time stamps make it more difficult to correlate
@@ -7484,12 +7486,27 @@ systems with limited audit storage capacity.
 </tr>
 <tr>
   <td></td>
+  <td>CCE-86077-5</td>
+  <td>Ensure Chrony is only configured with the server directive</td>
+  <td xml:lang="en-US">
+Check that Chrony only has time sources configured with the <tt>server</tt> directive.
+  </td>
+  <td xml:lang="en-US">
+Depending on the infrastruture being used the <tt>pool</tt> directive may not be supported.
+  </td>
+  <td></td>
+</tr>
+<tr>
+  <td></td>
   <td>CCE-82266-8</td>
   <td>Support session locking with tmux</td>
   <td xml:lang="en-US">
 The <tt>tmux</tt> terminal multiplexer is used to implement
 automatic session locking. It should be started from
-<tt>/etc/bashrc</tt>.
+<tt>/etc/bashrc</tt> or drop-in files within <tt>/etc/profile.d/</tt>.
+Additionally it must be ensured that the <tt>tmux</tt> process is running
+and it can be verified with the following command:
+<pre>ps all | grep tmux | grep -v grep</pre>
   </td>
   <td xml:lang="en-US">
 Unlike <tt>bash</tt> itself, the <tt>tmux</tt> terminal multiplexer
@@ -8118,7 +8135,7 @@ By decreasing the limit based on the amount of data and enabling
 time-based limit, effects of potential attacks against
 encryption keys are limited.
   </td>
-  <td>var_rekey_limit_size=1G<br/>var_rekey_limit_time=1hour</td>
+  <td>var_rekey_limit_time=1hour<br/>var_rekey_limit_size=1G</td>
 </tr>
 <tr>
   <td></td>

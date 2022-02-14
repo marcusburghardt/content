@@ -5616,6 +5616,8 @@ add the following:
 <pre>maxpoll <abbr title="$var_time_service_set_maxpoll"><tt>10</tt></abbr></pre>
 to <pre>server</pre> directives. If using chrony any <pre>pool</pre> directives
 should be configured too.
+If no <tt>server</tt> or <tt>pool</tt> directives are configured, the rule evaluates
+to pass.
   </td>
   <td xml:lang="en-US">
 Inaccurate time stamps make it more difficult to correlate

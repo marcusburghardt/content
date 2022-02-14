@@ -231,6 +231,7 @@ banner_etc_issue
 banner_etc_motd
 bios_enable_execution_restrictions
 chronyd_run_as_chrony_user
+chronyd_server_directive
 chronyd_specify_remote_server
 clean_components_post_updating
 configure_bashrc_exec_tmux
