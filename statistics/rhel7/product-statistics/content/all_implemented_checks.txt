@@ -566,6 +566,7 @@ package_opensc_installed
 package_openscap-scanner_installed
 package_openssh-server_installed
 package_openssh-server_removed
+package_pam_pwquality_installed
 package_pcsc-lite_installed
 package_policycoreutils_installed
 package_psacct_installed
@@ -1091,6 +1092,7 @@ sudo_require_reauthentication
 sudo_restrict_others_executable_permission
 sudo_restrict_privilege_elevation_to_authorized
 sudo_vdsm_nopasswd
+sudoers_default_includedir
 sudoers_explicit_command_args
 sudoers_no_command_negation
 sudoers_no_root_target

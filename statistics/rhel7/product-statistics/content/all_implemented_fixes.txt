@@ -497,6 +497,7 @@ package_opensc_installed
 package_openscap-scanner_installed
 package_openssh-server_installed
 package_openssh-server_removed
+package_pam_pwquality_installed
 package_pcsc-lite_installed
 package_policycoreutils_installed
 package_psacct_installed
@@ -1010,6 +1011,7 @@ sudo_remove_nopasswd
 sudo_require_authentication
 sudo_require_reauthentication
 sudo_restrict_others_executable_permission
+sudoers_default_includedir
 sudoers_validate_passwd
 sysconfig_networking_bootproto_ifcfg
 sysctl_fs_protected_hardlinks

@@ -4,7 +4,6 @@ account_unique_id
 account_unique_name
 account_use_centralized_automated_auth
 accounts_logon_fail_delay
-accounts_maximum_age_login_defs
 accounts_password_all_shadowed
 accounts_password_all_shadowed_sha512
 accounts_password_minlen_login_defs
@@ -118,4 +117,3 @@ sudo_vdsm_nopasswd
 sudoers_explicit_command_args
 sudoers_no_command_negation
 sudoers_no_root_target
-use_pam_wheel_for_su

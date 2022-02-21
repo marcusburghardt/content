@@ -392,6 +392,7 @@ grub2_enable_selinux
 grub2_init_on_alloc_argument
 grub2_ipv6_disable_argument
 grub2_kernel_trust_cpu_rng
+grub2_page_alloc_shuffle_argument
 grub2_page_poison_argument
 grub2_pti_argument
 grub2_slub_debug_argument
@@ -506,6 +507,7 @@ package_openscap-scanner_installed
 package_openssh-clients_installed
 package_openssh-server_installed
 package_openssh-server_removed
+package_pam_pwquality_installed
 package_pcsc-lite_installed
 package_policycoreutils-python-utils_installed
 package_policycoreutils_installed
@@ -966,6 +968,7 @@ sudo_remove_no_authenticate
 sudo_remove_nopasswd
 sudo_require_authentication
 sudo_require_reauthentication
+sudoers_default_includedir
 sudoers_validate_passwd
 sysctl_fs_protected_hardlinks
 sysctl_fs_protected_symlinks
@@ -1041,6 +1044,7 @@ zipl_audit_argument
 zipl_audit_backlog_limit_argument
 zipl_bootmap_is_up_to_date
 zipl_init_on_alloc_argument
+zipl_page_alloc_shuffle_argument
 zipl_page_poison_argument
 zipl_slub_debug_argument
 zipl_vsyscall_argument
