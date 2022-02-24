@@ -1116,11 +1116,7 @@ The session lock is implemented at the point where session activity can be deter
 Regardless of where the session lock is determined and implemented, once invoked, the session lock shall remain in place until the user re-authenticates. No other activity aside from re-authentication shall unlock the system.</td>
 <td xml:lang="en-US">The <code>tmux</code> terminal multiplexer is used to implement
 automatic session locking. It should be started from
-<code>/etc/bashrc</code> or drop-in files within <code>/etc/profile.d/</code>.
-Additionally it must be ensured that the <code>tmux</code> process is running
-and it can be verified with the following command:
-<pre>ps all | grep tmux | grep -v grep</pre>
-</td>
+<code>/etc/bashrc</code> or drop-in files within <code>/etc/profile.d/</code>.</td>
 <td>Applicable - Configurable</td>
 <td>Verify the operating system retains a user's session lock until that user reestablishes access using established identification and authentication procedures. If it does not, this is a finding.</td>
 <td>To verify that tmux is configured to execute,
@@ -1132,19 +1128,12 @@ if [ "$PS1" ]; then
   name=$(ps -o comm= -p $parent)
   case "$name" in sshd|login) exec tmux ;; esac
 fi
-To verify that the tmux process is running,
-run the following command:
-ps all | grep tmux | grep -v grep
-If the command does not produce output, this is a finding.
-      Is it the case that exec tmux is not present at the end of bashrc or tmux process is not running?
+      Is it the case that exec tmux is not present at the end of bashrc?
       </td>
 <td><fixtext xmlns="http://checklists.nist.gov/xccdf/1.1" fixref="F-3723r557051_fix">Configure the operating system to retain a user's session lock until that user reestablishes access using established identification and authentication procedures.</fixtext></td>
 <td>The tmux terminal multiplexer is used to implement
 automatic session locking. It should be started from
-/etc/bashrc or drop-in files within /etc/profile.d/.
-Additionally it must be ensured that the tmux process is running
-and it can be verified with the following command:
-ps all | grep tmux | grep -v grep</td>
+/etc/bashrc or drop-in files within /etc/profile.d/.</td>
 <td>medium</td>
 <td></td>
 <td></td>
@@ -1311,11 +1300,7 @@ The session lock is implemented at the point where session activity can be deter
 Publicly viewable images can include static or dynamic images, for example, patterns used with screen savers, photographic images, solid colors, a clock, a battery life indicator, or a blank screen, with the additional caveat that none of the images convey sensitive information.</td>
 <td xml:lang="en-US">The <code>tmux</code> terminal multiplexer is used to implement
 automatic session locking. It should be started from
-<code>/etc/bashrc</code> or drop-in files within <code>/etc/profile.d/</code>.
-Additionally it must be ensured that the <code>tmux</code> process is running
-and it can be verified with the following command:
-<pre>ps all | grep tmux | grep -v grep</pre>
-</td>
+<code>/etc/bashrc</code> or drop-in files within <code>/etc/profile.d/</code>.</td>
 <td>Applicable - Configurable</td>
 <td>Verify the operating system conceals, via the session lock, information previously visible on the display with a publicly viewable image. If it does not, this is a finding.</td>
 <td>To verify that tmux is configured to execute,
@@ -1327,19 +1312,12 @@ if [ "$PS1" ]; then
   name=$(ps -o comm= -p $parent)
   case "$name" in sshd|login) exec tmux ;; esac
 fi
-To verify that the tmux process is running,
-run the following command:
-ps all | grep tmux | grep -v grep
-If the command does not produce output, this is a finding.
-      Is it the case that exec tmux is not present at the end of bashrc or tmux process is not running?
+      Is it the case that exec tmux is not present at the end of bashrc?
       </td>
 <td><fixtext xmlns="http://checklists.nist.gov/xccdf/1.1" fixref="F-3726r557060_fix">Configure the operating system to conceal, via the session lock, information previously visible on the display with a publicly viewable image.</fixtext></td>
 <td>The tmux terminal multiplexer is used to implement
 automatic session locking. It should be started from
-/etc/bashrc or drop-in files within /etc/profile.d/.
-Additionally it must be ensured that the tmux process is running
-and it can be verified with the following command:
-ps all | grep tmux | grep -v grep</td>
+/etc/bashrc or drop-in files within /etc/profile.d/.</td>
 <td>medium</td>
 <td></td>
 <td></td>
@@ -13115,15 +13093,14 @@ FIPS mode by automatically configuring the following:
 </li>
 <li>Creating <code>/etc/system-fips</code>
 </li>
-<li>Setting the system crypto policy in <code>/etc/crypto-policies/config</code> to <code>FIPS</code>
+<li>Setting the system crypto policy in <code>/etc/crypto-policies/config</code> to <code><xccdf-1.1:sub xmlns:xccdf-1.1="http://checklists.nist.gov/xccdf/1.1" idref="var_system_crypto_policy"></xccdf-1.1:sub></code>
 </li>
 <li>Loading the Dracut <code>fips</code> module</li>
 </ul>
-This rule also ensures that the system policy is set to <code><xccdf-1.1:sub xmlns:xccdf-1.1="http://checklists.nist.gov/xccdf/1.1" idref="var_system_crypto_policy"></xccdf-1.1:sub></code>.
-Furthermore, the system running in FIPS mode should be FIPS certified by NIST.</td>
+</td>
 <td>Applicable - Configurable</td>
 <td>Verify the operating system implements NSA-approved cryptography to protect classified information in accordance with applicable federal laws, Executive Orders, directives, policies, regulations, and standards. If it does not, this is a finding.</td>
-<td>To verify that FIPS is enabled properly, run the following command:
+<td>To verify that FIPS mode is enabled properly, run the following command:
 fips-mode-setup --check
 The output should contain the following:
 FIPS mode is enabled.
@@ -13139,9 +13116,7 @@ fips-mode-setup --enable
 
 The fips-mode-setup command will configure the system in
 FIPS mode by automatically configuring the following:
-Setting the kernel FIPS mode flag (/proc/sys/crypto/fips_enabled) to 1Creating /etc/system-fipsSetting the system crypto policy in /etc/crypto-policies/config to FIPSLoading the Dracut fips module
-This rule also ensures that the system policy is set to .
-Furthermore, the system running in FIPS mode should be FIPS certified by NIST.</td>
+Setting the kernel FIPS mode flag (/proc/sys/crypto/fips_enabled) to 1Creating /etc/system-fipsSetting the system crypto policy in /etc/crypto-policies/config to Loading the Dracut fips module</td>
 <td>high</td>
 <td></td>
 <td></td>
@@ -20390,15 +20365,14 @@ FIPS mode by automatically configuring the following:
 </li>
 <li>Creating <code>/etc/system-fips</code>
 </li>
-<li>Setting the system crypto policy in <code>/etc/crypto-policies/config</code> to <code>FIPS</code>
+<li>Setting the system crypto policy in <code>/etc/crypto-policies/config</code> to <code><xccdf-1.1:sub xmlns:xccdf-1.1="http://checklists.nist.gov/xccdf/1.1" idref="var_system_crypto_policy"></xccdf-1.1:sub></code>
 </li>
 <li>Loading the Dracut <code>fips</code> module</li>
 </ul>
-This rule also ensures that the system policy is set to <code><xccdf-1.1:sub xmlns:xccdf-1.1="http://checklists.nist.gov/xccdf/1.1" idref="var_system_crypto_policy"></xccdf-1.1:sub></code>.
-Furthermore, the system running in FIPS mode should be FIPS certified by NIST.</td>
+</td>
 <td>Applicable - Configurable</td>
 <td>Verify the operating system implements NIST FIPS-validated cryptography for the following: to provision digital signatures, to generate cryptographic hashes, and to protect unclassified information requiring confidentiality and cryptographic protection in accordance with applicable federal laws, Executive Orders, directives, policies, regulations, and standards. If it does not, this is a finding.</td>
-<td>To verify that FIPS is enabled properly, run the following command:
+<td>To verify that FIPS mode is enabled properly, run the following command:
 fips-mode-setup --check
 The output should contain the following:
 FIPS mode is enabled.
@@ -20414,9 +20388,7 @@ fips-mode-setup --enable
 
 The fips-mode-setup command will configure the system in
 FIPS mode by automatically configuring the following:
-Setting the kernel FIPS mode flag (/proc/sys/crypto/fips_enabled) to 1Creating /etc/system-fipsSetting the system crypto policy in /etc/crypto-policies/config to FIPSLoading the Dracut fips module
-This rule also ensures that the system policy is set to .
-Furthermore, the system running in FIPS mode should be FIPS certified by NIST.</td>
+Setting the kernel FIPS mode flag (/proc/sys/crypto/fips_enabled) to 1Creating /etc/system-fipsSetting the system crypto policy in /etc/crypto-policies/config to Loading the Dracut fips module</td>
 <td>high</td>
 <td></td>
 <td></td>
