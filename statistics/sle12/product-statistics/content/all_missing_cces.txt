@@ -74,7 +74,6 @@ directory_permissions_var_log_audit
 disable_host_auth
 disable_prelink
 disable_users_coredumps
-disallow_bypass_password_sudo
 ensure_gpgcheck_never_disabled
 ensure_logrotate_activated
 ensure_suse_gpgkey_installed
@@ -160,6 +159,8 @@ gnome_gdm_disable_xdmcp
 grub2_audit_argument
 grub2_audit_backlog_limit_argument
 grub2_enable_iommu_force
+grub2_nosmap_argument_absent
+grub2_nosmep_argument_absent
 harden_ssh_client_crypto_policy
 harden_sshd_crypto_policy
 install_PAE_kernel_on_x86-32
