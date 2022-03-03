@@ -212,7 +212,6 @@ nfs_fixed_mountd_port
 nfs_fixed_statd_port
 nfs_no_anonymous
 no_all_squash_exports
-no_empty_passwords_etc_shadow
 no_files_unowned_by_user
 no_host_based_files
 no_insecure_locks_exports
@@ -245,8 +244,6 @@ root_path_no_dot
 rsyslog_accept_remote_messages_tcp
 rsyslog_accept_remote_messages_udp
 rsyslog_cron_logging
-rsyslog_encrypt_offload_actionsendstreamdrivermode
-rsyslog_encrypt_offload_defaultnetstreamdriver
 rsyslog_files_groupownership
 rsyslog_files_ownership
 rsyslog_files_permissions
