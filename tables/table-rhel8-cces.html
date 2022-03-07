@@ -9425,6 +9425,24 @@ Add the <code>nosuid</code> option to the fourth column of
 <code>/opt</code>.</td>
 </tr>
 <tr>
+<td>CCE-85882-9</td>
+<td>Add hidepid Option to /proc</td>
+<td xml:lang="en-US">The <code>hidepid</code> mount option is applicable to <code>/proc</code> and is used to
+control who can access the information in <code>/proc/[pid]</code> directories.
+The option can have one of the following values:
+<pre>
+0: Everybody may access all /proc/[pid] directories.
+1: Users may not access files and subdirectories inside any /proc/[pid] directories
+   but their own. The /proc/[pid] directories themselves remain visible.
+2: Same as for mode 1, but in addition the /proc/[pid] directories belonging to other
+   users become invisible.
+</pre>
+For example, if you choose the value 2:
+Add the <code>hidepid=2</code> option to the fourth column of
+<code>/etc/fstab</code> for the line which controls mounting of
+<code>/proc</code>.</td>
+</tr>
+<tr>
 <td>CCE-83322-8</td>
 <td>Add nosuid Option to /srv</td>
 <td xml:lang="en-US">The <code>nosuid</code> mount option can be used to prevent
