@@ -4604,9 +4604,9 @@ The profile requirement is <code><xccdf-1.1:sub xmlns:xccdf-1.1="http://checklis
 </tr></table>
 <table><tr>
 <td>Set Existing Passwords Maximum Age</td>
-<td xml:lang="en-US">Configure non-compliant accounts to enforce a 60-day maximum password lifetime
+<td xml:lang="en-US">Configure non-compliant accounts to enforce a <xccdf-1.1:sub xmlns:xccdf-1.1="http://checklists.nist.gov/xccdf/1.1" idref="var_accounts_maximum_age_login_defs"></xccdf-1.1:sub>-day maximum password lifetime
 restriction by running the following command:
-<pre>$ sudo chage -M 60 <i>USER</i></pre>
+<pre>$ sudo chage -M <xccdf-1.1:sub xmlns:xccdf-1.1="http://checklists.nist.gov/xccdf/1.1" idref="var_accounts_maximum_age_login_defs"></xccdf-1.1:sub> <i>USER</i></pre>
 </td>
 </tr></table>
 </td>
@@ -5083,6 +5083,21 @@ Techniques used to address this include protocols using nonces (e.g., numbers ge
 Peripherals include, but are not limited to, such devices as flash drives, external storage, and printers.</td>
 <td>
 <table><tr>
+<td>Disable GNOME3 Automounting</td>
+<td xml:lang="en-US">The system's default desktop environment, GNOME3, will mount
+devices and removable media (such as DVDs, CDs and USB flash drives) whenever
+they are inserted into the system. To disable automount within GNOME3, add or set
+<code>automount</code> to <code>false</code> in <code>/etc/dconf/db/local.d/00-security-settings</code>.
+For example:
+<pre>[org/gnome/desktop/media-handling]
+automount=false</pre>
+Once the settings have been added, add a lock to
+<code>/etc/dconf/db/local.d/locks/00-security-settings-lock</code> to prevent user modification.
+For example:
+<pre>/org/gnome/desktop/media-handling/automount</pre>
+After the settings have been set, run <code>dconf update</code>.</td>
+</tr></table>
+<table><tr>
 <td>Disable GNOME3 Automount Opening</td>
 <td xml:lang="en-US">The system's default desktop environment, GNOME3, will mount
 devices and removable media (such as DVDs, CDs and USB flash drives) whenever
@@ -5353,22 +5368,6 @@ setting in a file loaded by <code>/etc/profile</code>, e.g.
 </td>
 </tr></table>
 <table><tr>
-<td>Set SSH Idle Timeout Interval</td>
-<td xml:lang="en-US">SSH allows administrators to set an idle timeout interval. After this interval
-has passed, the idle user will be automatically logged out.
-<br><br>
-To set an idle timeout interval, edit the following line in <code>/etc/ssh/sshd_config</code> as
-follows:
-<pre>ClientAliveInterval <b><xccdf-1.1:sub xmlns:xccdf-1.1="http://checklists.nist.gov/xccdf/1.1" idref="sshd_idle_timeout_value"></xccdf-1.1:sub></b></pre>
-<br><br>
-The timeout <b>interval</b> is given in seconds. For example, have a timeout
-of 10 minutes, set <b>interval</b> to 600.
-<br><br>
-If a shorter timeout has already been set for the login shell, that value will
-preempt any SSH setting made in <code>/etc/ssh/sshd_config</code>. Keep in mind that
-some processes may stop SSH  from correctly detecting that the user is idle.</td>
-</tr></table>
-<table><tr>
 <td>Set SSH Client Alive Count Max to zero</td>
 <td xml:lang="en-US">The SSH server sends at most <code>ClientAliveCountMax</code> messages
 during a SSH session and waits for a response from the SSH client.
@@ -5383,6 +5382,22 @@ value of <code>0</code> in
 
 
 <code>/etc/ssh/sshd_config</code>:</td>
+</tr></table>
+<table><tr>
+<td>Set SSH Idle Timeout Interval</td>
+<td xml:lang="en-US">SSH allows administrators to set an idle timeout interval. After this interval
+has passed, the idle user will be automatically logged out.
+<br><br>
+To set an idle timeout interval, edit the following line in <code>/etc/ssh/sshd_config</code> as
+follows:
+<pre>ClientAliveInterval <b><xccdf-1.1:sub xmlns:xccdf-1.1="http://checklists.nist.gov/xccdf/1.1" idref="sshd_idle_timeout_value"></xccdf-1.1:sub></b></pre>
+<br><br>
+The timeout <b>interval</b> is given in seconds. For example, have a timeout
+of 10 minutes, set <b>interval</b> to 600.
+<br><br>
+If a shorter timeout has already been set for the login shell, that value will
+preempt any SSH setting made in <code>/etc/ssh/sshd_config</code>. Keep in mind that
+some processes may stop SSH  from correctly detecting that the user is idle.</td>
 </tr></table>
 </td>
 </tr>
@@ -6365,22 +6380,6 @@ Conditions or trigger events requiring automatic session termination can include
 This capability is typically reserved for specific operating system functionality where the system owner, data owner, or organization requires additional assurance.</td>
 <td>
 <table><tr>
-<td>Set SSH Idle Timeout Interval</td>
-<td xml:lang="en-US">SSH allows administrators to set an idle timeout interval. After this interval
-has passed, the idle user will be automatically logged out.
-<br><br>
-To set an idle timeout interval, edit the following line in <code>/etc/ssh/sshd_config</code> as
-follows:
-<pre>ClientAliveInterval <b><xccdf-1.1:sub xmlns:xccdf-1.1="http://checklists.nist.gov/xccdf/1.1" idref="sshd_idle_timeout_value"></xccdf-1.1:sub></b></pre>
-<br><br>
-The timeout <b>interval</b> is given in seconds. For example, have a timeout
-of 10 minutes, set <b>interval</b> to 600.
-<br><br>
-If a shorter timeout has already been set for the login shell, that value will
-preempt any SSH setting made in <code>/etc/ssh/sshd_config</code>. Keep in mind that
-some processes may stop SSH  from correctly detecting that the user is idle.</td>
-</tr></table>
-<table><tr>
 <td>Set SSH Client Alive Count Max to zero</td>
 <td xml:lang="en-US">The SSH server sends at most <code>ClientAliveCountMax</code> messages
 during a SSH session and waits for a response from the SSH client.
@@ -6395,6 +6394,22 @@ value of <code>0</code> in
 
 
 <code>/etc/ssh/sshd_config</code>:</td>
+</tr></table>
+<table><tr>
+<td>Set SSH Idle Timeout Interval</td>
+<td xml:lang="en-US">SSH allows administrators to set an idle timeout interval. After this interval
+has passed, the idle user will be automatically logged out.
+<br><br>
+To set an idle timeout interval, edit the following line in <code>/etc/ssh/sshd_config</code> as
+follows:
+<pre>ClientAliveInterval <b><xccdf-1.1:sub xmlns:xccdf-1.1="http://checklists.nist.gov/xccdf/1.1" idref="sshd_idle_timeout_value"></xccdf-1.1:sub></b></pre>
+<br><br>
+The timeout <b>interval</b> is given in seconds. For example, have a timeout
+of 10 minutes, set <b>interval</b> to 600.
+<br><br>
+If a shorter timeout has already been set for the login shell, that value will
+preempt any SSH setting made in <code>/etc/ssh/sshd_config</code>. Keep in mind that
+some processes may stop SSH  from correctly detecting that the user is idle.</td>
 </tr></table>
 </td>
 </tr>
@@ -6484,7 +6499,7 @@ normal usage of the wireless capability.
 
 Configure the system to disable all wireless network interfaces with the
 following command:
-<pre>$ sudo nmcli radio wifi off</pre>
+<pre>$ sudo nmcli radio all off</pre>
 </td>
 </tr></table></td>
 </tr>
@@ -6506,7 +6521,7 @@ normal usage of the wireless capability.
 
 Configure the system to disable all wireless network interfaces with the
 following command:
-<pre>$ sudo nmcli radio wifi off</pre>
+<pre>$ sudo nmcli radio all off</pre>
 </td>
 </tr></table></td>
 </tr>
@@ -6946,10 +6961,12 @@ Some programs and processes are required to operate at a higher privilege level 
 <td xml:lang="en-US">Verify the system generates an audit record when privileged functions are executed.
 <pre># grep -iw execve <code>/etc/audit/audit.rules</code></pre>
 
+
 <pre>-a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
+
 
 If both the "b32" and "b64" audit rules for "SUID" files are not defined, this is a finding.
 If both the "b32" and "b64" audit rules for "SGID" files are not defined, this is a finding.</td>
@@ -6966,10 +6983,12 @@ If both the "b32" and "b64" audit rules for "SGID" files are not defined, this i
 <td xml:lang="en-US">Verify the system generates an audit record when privileged functions are executed.
 <pre># grep -iw execve <code>/etc/audit/audit.rules</code></pre>
 
+
 <pre>-a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
+
 
 If both the "b32" and "b64" audit rules for "SUID" files are not defined, this is a finding.
 If both the "b32" and "b64" audit rules for "SGID" files are not defined, this is a finding.</td>
@@ -7051,10 +7070,12 @@ This requirement enables organizations to extend or limit auditing as necessary 
 <td xml:lang="en-US">Verify the system generates an audit record when privileged functions are executed.
 <pre># grep -iw execve <code>/etc/audit/audit.rules</code></pre>
 
+
 <pre>-a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
+
 
 If both the "b32" and "b64" audit rules for "SUID" files are not defined, this is a finding.
 If both the "b32" and "b64" audit rules for "SGID" files are not defined, this is a finding.</td>
@@ -7245,10 +7266,12 @@ Audit reduction is a technique used to reduce the volume of audit records in ord
 <td xml:lang="en-US">Verify the system generates an audit record when privileged functions are executed.
 <pre># grep -iw execve <code>/etc/audit/audit.rules</code></pre>
 
+
 <pre>-a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
+
 
 If both the "b32" and "b64" audit rules for "SUID" files are not defined, this is a finding.
 If both the "b32" and "b64" audit rules for "SGID" files are not defined, this is a finding.</td>
@@ -7269,10 +7292,12 @@ This requirement is specific to operating systems with audit reduction capabilit
 <td xml:lang="en-US">Verify the system generates an audit record when privileged functions are executed.
 <pre># grep -iw execve <code>/etc/audit/audit.rules</code></pre>
 
+
 <pre>-a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
+
 
 If both the "b32" and "b64" audit rules for "SUID" files are not defined, this is a finding.
 If both the "b32" and "b64" audit rules for "SGID" files are not defined, this is a finding.</td>
@@ -7291,10 +7316,12 @@ Report generation must be capable of generating on-demand (i.e., customizable, a
 <td xml:lang="en-US">Verify the system generates an audit record when privileged functions are executed.
 <pre># grep -iw execve <code>/etc/audit/audit.rules</code></pre>
 
+
 <pre>-a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
+
 
 If both the "b32" and "b64" audit rules for "SUID" files are not defined, this is a finding.
 If both the "b32" and "b64" audit rules for "SGID" files are not defined, this is a finding.</td>
@@ -7313,10 +7340,12 @@ Report generation must be capable of generating on-demand (i.e., customizable, a
 <td xml:lang="en-US">Verify the system generates an audit record when privileged functions are executed.
 <pre># grep -iw execve <code>/etc/audit/audit.rules</code></pre>
 
+
 <pre>-a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
+
 
 If both the "b32" and "b64" audit rules for "SUID" files are not defined, this is a finding.
 If both the "b32" and "b64" audit rules for "SGID" files are not defined, this is a finding.</td>
@@ -7335,10 +7364,12 @@ The report generation capability must support after-the-fact investigations of s
 <td xml:lang="en-US">Verify the system generates an audit record when privileged functions are executed.
 <pre># grep -iw execve <code>/etc/audit/audit.rules</code></pre>
 
+
 <pre>-a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
+
 
 If both the "b32" and "b64" audit rules for "SUID" files are not defined, this is a finding.
 If both the "b32" and "b64" audit rules for "SGID" files are not defined, this is a finding.</td>
@@ -7359,10 +7390,12 @@ This requirement is specific to operating systems providing audit reduction capa
 <td xml:lang="en-US">Verify the system generates an audit record when privileged functions are executed.
 <pre># grep -iw execve <code>/etc/audit/audit.rules</code></pre>
 
+
 <pre>-a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
+
 
 If both the "b32" and "b64" audit rules for "SUID" files are not defined, this is a finding.
 If both the "b32" and "b64" audit rules for "SGID" files are not defined, this is a finding.</td>
@@ -7383,10 +7416,12 @@ This requirement is specific to operating systems providing report generation ca
 <td xml:lang="en-US">Verify the system generates an audit record when privileged functions are executed.
 <pre># grep -iw execve <code>/etc/audit/audit.rules</code></pre>
 
+
 <pre>-a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
+
 
 If both the "b32" and "b64" audit rules for "SUID" files are not defined, this is a finding.
 If both the "b32" and "b64" audit rules for "SGID" files are not defined, this is a finding.</td>
@@ -7453,10 +7488,12 @@ Time stamps generated by the operating system include date and time. Granularity
 <td xml:lang="en-US">Verify the system generates an audit record when privileged functions are executed.
 <pre># grep -iw execve <code>/etc/audit/audit.rules</code></pre>
 
+
 <pre>-a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
+
 
 If both the "b32" and "b64" audit rules for "SUID" files are not defined, this is a finding.
 If both the "b32" and "b64" audit rules for "SGID" files are not defined, this is a finding.</td>
@@ -7476,10 +7513,12 @@ Time stamps generated by the operating system include date and time. Time is com
 <td xml:lang="en-US">Verify the system generates an audit record when privileged functions are executed.
 <pre># grep -iw execve <code>/etc/audit/audit.rules</code></pre>
 
+
 <pre>-a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
+
 
 If both the "b32" and "b64" audit rules for "SUID" files are not defined, this is a finding.
 If both the "b32" and "b64" audit rules for "SGID" files are not defined, this is a finding.</td>
@@ -7649,10 +7688,12 @@ The <code>auditd</code> service can be enabled with the following command:
 <td xml:lang="en-US">Verify the system generates an audit record when privileged functions are executed.
 <pre># grep -iw execve <code>/etc/audit/audit.rules</code></pre>
 
+
 <pre>-a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
+
 
 If both the "b32" and "b64" audit rules for "SUID" files are not defined, this is a finding.
 If both the "b32" and "b64" audit rules for "SGID" files are not defined, this is a finding.</td>
@@ -8047,6 +8088,21 @@ services = sudo, autofs, pam
 
 Peripherals include, but are not limited to, such devices as flash drives, external storage, and printers.</td>
 <td>
+<table><tr>
+<td>Disable GNOME3 Automounting</td>
+<td xml:lang="en-US">The system's default desktop environment, GNOME3, will mount
+devices and removable media (such as DVDs, CDs and USB flash drives) whenever
+they are inserted into the system. To disable automount within GNOME3, add or set
+<code>automount</code> to <code>false</code> in <code>/etc/dconf/db/local.d/00-security-settings</code>.
+For example:
+<pre>[org/gnome/desktop/media-handling]
+automount=false</pre>
+Once the settings have been added, add a lock to
+<code>/etc/dconf/db/local.d/locks/00-security-settings-lock</code> to prevent user modification.
+For example:
+<pre>/org/gnome/desktop/media-handling/automount</pre>
+After the settings have been set, run <code>dconf update</code>.</td>
+</tr></table>
 <table><tr>
 <td>Disable GNOME3 Automount Opening</td>
 <td xml:lang="en-US">The system's default desktop environment, GNOME3, will mount
@@ -9366,7 +9422,7 @@ normal usage of the wireless capability.
 
 Configure the system to disable all wireless network interfaces with the
 following command:
-<pre>$ sudo nmcli radio wifi off</pre>
+<pre>$ sudo nmcli radio all off</pre>
 </td>
 </tr></table>
 <table><tr>
@@ -13885,6 +13941,21 @@ in the following directories:
 </td>
 </tr></table>
 <table><tr>
+<td>Disable GNOME3 Automounting</td>
+<td xml:lang="en-US">The system's default desktop environment, GNOME3, will mount
+devices and removable media (such as DVDs, CDs and USB flash drives) whenever
+they are inserted into the system. To disable automount within GNOME3, add or set
+<code>automount</code> to <code>false</code> in <code>/etc/dconf/db/local.d/00-security-settings</code>.
+For example:
+<pre>[org/gnome/desktop/media-handling]
+automount=false</pre>
+Once the settings have been added, add a lock to
+<code>/etc/dconf/db/local.d/locks/00-security-settings-lock</code> to prevent user modification.
+For example:
+<pre>/org/gnome/desktop/media-handling/automount</pre>
+After the settings have been set, run <code>dconf update</code>.</td>
+</tr></table>
+<table><tr>
 <td>Disable GNOME3 Automount Opening</td>
 <td xml:lang="en-US">The system's default desktop environment, GNOME3, will mount
 devices and removable media (such as DVDs, CDs and USB flash drives) whenever
@@ -14216,7 +14287,20 @@ There must be a resolvable DNS CNAME or Alias record set to "<xccdf-1.1:sub xmln
 </tr></table>
 <table><tr>
 <td>Configure Multiple DNS Servers in /etc/resolv.conf</td>
-<td xml:lang="en-US">Multiple Domain Name System (DNS) Servers should be configured
+<td xml:lang="en-US">
+Determine whether the system is using local or DNS name resolution with the
+following command:
+<pre>$ sudo grep hosts /etc/nsswitch.conf
+hosts: files dns</pre>
+If the DNS entry is missing from the host's line in the "/etc/nsswitch.conf"
+file, the "/etc/resolv.conf" file must be empty.
+Verify the "/etc/resolv.conf" file is empty with the following command:
+<pre>$ sudo ls -al /etc/resolv.conf
+-rw-r--r-- 1 root root 0 Aug 19 08:31 resolv.conf</pre>
+If the DNS entry is found on the host's line of the "/etc/nsswitch.conf" file,
+then verify the following:<br>
+
+Multiple Domain Name System (DNS) Servers should be configured
 in <code>/etc/resolv.conf</code>. This provides redundant name resolution services
 in the event that a domain server crashes. To configure the system to contain
 as least <code>2</code> DNS servers, add a corresponding <code>nameserver
@@ -14894,7 +14978,7 @@ normal usage of the wireless capability.
 
 Configure the system to disable all wireless network interfaces with the
 following command:
-<pre>$ sudo nmcli radio wifi off</pre>
+<pre>$ sudo nmcli radio all off</pre>
 </td>
 </tr></table></td>
 </tr>

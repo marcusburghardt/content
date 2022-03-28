@@ -246,9 +246,9 @@ elapse until the account would be automatically disabled. See the
 <tt>useradd</tt> man page for more information.
   </td>
   <td xml:lang="en-US">
-Disabling inactive accounts ensures that accounts which may not
-have been responsibly removed are not available to attackers
-who may have compromised their credentials.
+Inactive identifiers pose a risk to systems and applications because attackers may exploit an inactive identifier and potentially obtain undetected access to the system.
+Disabling inactive accounts ensures that accounts which may not have been responsibly removed are not available to attackers who may have compromised their credentials.
+Owners of inactive accounts will not notice if unauthorized access to their user account has been obtained.
   </td>
 </tr>
 <tr>
@@ -826,11 +826,11 @@ can be enabled on the login screen by setting <tt>enable-smartcard-authenticatio
 to <tt>true</tt>.
 <br /><br />
 To enable, add or edit <tt>enable-smartcard-authentication</tt> to
-<tt>/etc/dconf/db/gdm.d/00-security-settings</tt>. For example:
+<tt>/etc/dconf/db/local.d/00-security-settings</tt>. For example:
 <pre>[org/gnome/login-screen]
 enable-smartcard-authentication=true</pre>
 Once the setting has been added, add a lock to
-<tt>/etc/dconf/db/gdm.d/locks/00-security-settings-lock</tt> to prevent user modification.
+<tt>/etc/dconf/db/local.d/locks/00-security-settings-lock</tt> to prevent user modification.
 For example:
 <pre>/org/gnome/login-screen/enable-smartcard-authentication</pre>
 After the settings have been set, run <tt>dconf update</tt>.

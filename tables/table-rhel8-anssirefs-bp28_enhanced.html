@@ -541,10 +541,10 @@ PAE kernel is required to enable either Execute Disable (XD) or No Execute (NX) 
   <td>CCE-80914-5</td>
   <td>Enable ExecShield via sysctl</td>
   <td xml:lang="en-US">
-By default on Red Hat Enterprise Linux 7 64-bit systems, ExecShield is
+By default on Red Hat Enterprise Linux 8 64-bit systems, ExecShield is
 enabled and can only be disabled if the hardware does not support
-ExecShield or is disabled in <tt>/etc/default/grub</tt>. For Red Hat
-Enterprise Linux 7 32-bit systems, <tt>sysctl</tt> can be used to enable
+ExecShield or is disabled in <tt>/etc/default/grub</tt>. For
+Red Hat Enterprise Linux 8  32-bit systems, <tt>sysctl</tt> can be used to enable
 ExecShield.
   </td>
   <td xml:lang="en-US">
@@ -682,33 +682,6 @@ Add the <code>nosuid</code> option to the fourth column of
 The presence of SUID and SGID executables should be tightly controlled. The
 <tt>/opt</tt> directory contains additional software packages. Users should
 not be able to execute SUID or SGID binaries from this directory.
-  </td>
-  <td></td>
-</tr>
-<tr>
-  <td>BP28(R12)</td>
-  <td>CCE-85882-9</td>
-  <td>Add hidepid Option to /proc</td>
-  <td xml:lang="en-US">
-The <tt>hidepid</tt> mount option is applicable to <tt>/proc</tt> and is used to
-control who can access the information in <tt>/proc/[pid]</tt> directories.
-The option can have one of the following values:
-<pre>
-0: Everybody may access all /proc/[pid] directories.
-1: Users may not access files and subdirectories inside any /proc/[pid] directories
-   but their own. The /proc/[pid] directories themselves remain visible.
-2: Same as for mode 1, but in addition the /proc/[pid] directories belonging to other
-   users become invisible.
-</pre>
-For example, if you choose the value 2:
-Add the <code>hidepid=2</code> option to the fourth column of
-<tt>/etc/fstab</tt> for the line which controls mounting of
-<code>/proc</code>.
-  </td>
-  <td xml:lang="en-US">
-Users should not be able to see and access directories within /proc, which are not
-related to their own processes in a system. Otherwise, sensitive information from
-other users could be seem.
   </td>
   <td></td>
 </tr>

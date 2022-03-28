@@ -1657,7 +1657,14 @@ The <code>firewalld</code> package can be installed with the following command:
 $ sudo yum install firewalld</pre>
   </td>
   <td xml:lang="en-US">
-The firewalld package should be installed to provide access control methods.
+"Firewalld" provides an easy and effective way to block/limit remote access to the system via ports, services, and protocols.
+
+Remote access services, such as those providing remote access to network devices and information systems, which lack automated control capabilities, increase risk and make remote user access management difficult at best.
+
+Remote access is access to DoD nonpublic information systems by an authorized user (or an information system) communicating through an external, non-organization-controlled network. Remote access methods include, for example, dial-up, broadband, and wireless.
+
+Red Hat Enterprise Linux 8 functionality (e.g., SSH) must be capable of taking enforcement action if the audit reveals unauthorized activity.
+Automated control of remote access sessions allows organizations to ensure ongoing compliance with remote access policies by enforcing connection rules of remote access applications on a variety of information system components (e.g., servers, workstations, notebook computers, smartphones, and tablets)."
   </td>
   <td></td>
 </tr>
@@ -3547,6 +3554,9 @@ automatic session locking. It should be started from
   <td xml:lang="en-US">
 Unlike <tt>bash</tt> itself, the <tt>tmux</tt> terminal multiplexer
 provides a mechanism to lock sessions after period of inactivity.
+A session lock is a temporary action taken when a user stops work and moves away from the
+immediate physical vicinity of the information system but does not want to
+log out because of the temporary nature of the absence.
   </td>
   <td></td>
 </tr>
@@ -3777,36 +3787,6 @@ over sockets.
 </tr>
 <tr>
   <td></td>
-  <td>CCE-82913-5</td>
-  <td>Uninstall abrt-plugin-logger Package</td>
-  <td xml:lang="en-US">
-The <code>abrt-plugin-logger</code> package can be removed with the following command:
-<pre>
-$ sudo yum erase abrt-plugin-logger</pre>
-  </td>
-  <td xml:lang="en-US">
-<tt>abrt-plugin-logger</tt> is an ABRT plugin which writes a report
-to a specified file.
-  </td>
-  <td></td>
-</tr>
-<tr>
-  <td></td>
-  <td>CCE-82916-8</td>
-  <td>Uninstall abrt-plugin-rhtsupport Package</td>
-  <td xml:lang="en-US">
-The <code>abrt-plugin-rhtsupport</code> package can be removed with the following command:
-<pre>
-$ sudo yum erase abrt-plugin-rhtsupport</pre>
-  </td>
-  <td xml:lang="en-US">
-<tt>abrt-plugin-rhtsupport</tt> is a ABRT plugin to report bugs into the
-Red Hat Support system.
-  </td>
-  <td></td>
-</tr>
-<tr>
-  <td></td>
   <td>CCE-82910-1</td>
   <td>Uninstall abrt-plugin-sosreport Package</td>
   <td xml:lang="en-US">
@@ -3986,6 +3966,36 @@ Kerberos programs (<tt>kinit</tt>, <tt>klist</tt>, <tt>kdestroy</tt>, <tt>kpassw
 
 Currently, Kerberos does not utilize FIPS 140-2 cryptography and is not permitted on Government networks,
 nor is it permitted in many regulatory environments such as HIPAA.
+  </td>
+  <td></td>
+</tr>
+<tr>
+  <td></td>
+  <td>CCE-89201-8</td>
+  <td>Uninstall libreport-plugin-logger Package</td>
+  <td xml:lang="en-US">
+The <code>libreport-plugin-logger</code> package can be removed with the following command:
+<pre>
+$ sudo yum erase libreport-plugin-logger</pre>
+  </td>
+  <td xml:lang="en-US">
+<tt>libreport-plugin-logger</tt> is a ABRT plugin to report bugs into the
+Red Hat Support system.
+  </td>
+  <td></td>
+</tr>
+<tr>
+  <td></td>
+  <td>CCE-88955-0</td>
+  <td>Uninstall libreport-plugin-rhtsupport Package</td>
+  <td xml:lang="en-US">
+The <code>libreport-plugin-rhtsupport</code> package can be removed with the following command:
+<pre>
+$ sudo yum erase libreport-plugin-rhtsupport</pre>
+  </td>
+  <td xml:lang="en-US">
+<tt>libreport-plugin-rhtsupport</tt> is a ABRT plugin to report bugs into the
+Red Hat Support system.
   </td>
   <td></td>
 </tr>
@@ -4207,7 +4217,7 @@ By decreasing the limit based on the amount of data and enabling
 time-based limit, effects of potential attacks against
 encryption keys are limited.
   </td>
-  <td>var_ssh_client_rekey_limit_time=1hour<br/>var_ssh_client_rekey_limit_size=1G</td>
+  <td>var_ssh_client_rekey_limit_size=1G<br/>var_ssh_client_rekey_limit_time=1hour</td>
 </tr>
 <tr>
   <td></td>

@@ -14803,8 +14803,7 @@ The profile requirement is <code><xccdf-1.1:sub xmlns:xccdf-1.1="http://checklis
 <td>Verify operating system enforces a 60-day maximum password lifetime restriction. If it does not, this is a finding.</td>
 <td>To check the maximum password age, run the command:
 $ grep PASS_MAX_DAYS /etc/login.defs
-The DoD and FISMA requirement is 60.
-A value of 180 days is sufficient for many environments.
+The profile requirement is .
       Is it the case that PASS_MAX_DAYS is not set equal to or greater than the required value?
       </td>
 <td><fixtext xmlns="http://checklists.nist.gov/xccdf/1.1" fixref="F-3757r557621_fix">Configure operating system to enforce a 60-day maximum password lifetime restriction. </fixtext></td>
@@ -14827,23 +14826,23 @@ The profile requirement is .</td>
 <td>Operating systems must enforce a 60-day maximum password lifetime restriction.</td>
 <td>CCE-80522-6:Set Existing Passwords Maximum Age</td>
 <td>Any password, no matter how complex, can eventually be cracked. Therefore, passwords need to be changed periodically. If the operating system does not limit the lifetime of passwords and force users to change their passwords, there is the risk that the operating system passwords could be compromised.</td>
-<td xml:lang="en-US">Configure non-compliant accounts to enforce a 60-day maximum password lifetime
+<td xml:lang="en-US">Configure non-compliant accounts to enforce a <xccdf-1.1:sub xmlns:xccdf-1.1="http://checklists.nist.gov/xccdf/1.1" idref="var_accounts_maximum_age_login_defs"></xccdf-1.1:sub>-day maximum password lifetime
 restriction by running the following command:
-<pre>$ sudo chage -M 60 <i>USER</i></pre>
+<pre>$ sudo chage -M <xccdf-1.1:sub xmlns:xccdf-1.1="http://checklists.nist.gov/xccdf/1.1" idref="var_accounts_maximum_age_login_defs"></xccdf-1.1:sub> <i>USER</i></pre>
 </td>
 <td>Applicable - Configurable</td>
 <td>Verify operating system enforces a 60-day maximum password lifetime restriction. If it does not, this is a finding.</td>
-<td>Check whether the maximum time period for existing passwords is restricted
-to 60 days by running the following command for each user:
-$ sudo chage -l USER | grep Maximum
-The output for each user should return something similary to the following:
-Maximum number of days between password change\t\t: 60
-      Is it the case that existing passwords are not configured correctly?
+<td>Check whether the maximum time period for existing passwords is restricted to  days with the following commands:
+
+$ sudo awk -F: '$5 &gt; 60 {print $1 "" "" $5}' /etc/shadow
+
+$ sudo awk -F: '$5 &lt;= 0 {print $1 "" "" $5}' /etc/shadow
+      Is it the case that any results are returned that are not associated with a system account?
       </td>
 <td><fixtext xmlns="http://checklists.nist.gov/xccdf/1.1" fixref="F-3757r557621_fix">Configure operating system to enforce a 60-day maximum password lifetime restriction. </fixtext></td>
-<td>Configure non-compliant accounts to enforce a 60-day maximum password lifetime
+<td>Configure non-compliant accounts to enforce a -day maximum password lifetime
 restriction by running the following command:
-$ sudo chage -M 60 USER</td>
+$ sudo chage -M  USER</td>
 <td>medium</td>
 <td></td>
 <td></td>
@@ -15357,7 +15356,7 @@ Run the following command to determine the current status of the
 firewalld service:
 $ systemctl is-active firewalld
 If the service is running, it should return the following: active
-      Is it the case that ?
+      Is it the case that the service is not enabled?
       </td>
 <td><fixtext xmlns="http://checklists.nist.gov/xccdf/1.1" fixref="F-3763r557641_fix">Configure the operating system to prohibit or restrict the use of functions, ports, protocols, and/or services, as defined in the PPSM CAL and vulnerability assessments.</fixtext></td>
 <td>
@@ -15985,6 +15984,55 @@ Techniques used to address this include protocols using nonces (e.g., numbers ge
 <td>SRG-OS-000114-GPOS-00059</td>
 <td><i>TBD - Assigned by DISA after STIG release</i></td>
 <td>The operating system must uniquely identify peripherals before establishing a connection.</td>
+<td>CCE-80122-5:Disable GNOME3 Automounting</td>
+<td>Without identifying devices, unidentified or unknown devices may be introduced, thereby facilitating malicious activity.
+
+Peripherals include, but are not limited to, such devices as flash drives, external storage, and printers.</td>
+<td xml:lang="en-US">The system's default desktop environment, GNOME3, will mount
+devices and removable media (such as DVDs, CDs and USB flash drives) whenever
+they are inserted into the system. To disable automount within GNOME3, add or set
+<code>automount</code> to <code>false</code> in <code>/etc/dconf/db/local.d/00-security-settings</code>.
+For example:
+<pre>[org/gnome/desktop/media-handling]
+automount=false</pre>
+Once the settings have been added, add a lock to
+<code>/etc/dconf/db/local.d/locks/00-security-settings-lock</code> to prevent user modification.
+For example:
+<pre>/org/gnome/desktop/media-handling/automount</pre>
+After the settings have been set, run <code>dconf update</code>.</td>
+<td>Applicable - Configurable</td>
+<td>Verify the operating system uniquely identifies peripherals before establishing a connection. If it does not, this is a finding.</td>
+<td>These settings can be verified by running the following:
+$ gsettings get org.gnome.desktop.media-handling automount
+If properly configured, the output for automount should be false.
+To ensure that users cannot enable automount in GNOME3, run the following:
+$ grep 'automount' /etc/dconf/db/local.d/locks/*
+If properly configured, the output for automount should be /org/gnome/desktop/media-handling/automount
+      Is it the case that GNOME automounting is not disabled?
+      </td>
+<td><fixtext xmlns="http://checklists.nist.gov/xccdf/1.1" fixref="F-3772r557187_fix">Configure the operating system to uniquely identify peripherals before establishing a connection.</fixtext></td>
+<td>The system's default desktop environment, GNOME3, will mount
+devices and removable media (such as DVDs, CDs and USB flash drives) whenever
+they are inserted into the system. To disable automount within GNOME3, add or set
+automount to false in /etc/dconf/db/local.d/00-security-settings.
+For example:
+[org/gnome/desktop/media-handling]
+automount=false
+Once the settings have been added, add a lock to
+/etc/dconf/db/local.d/locks/00-security-settings-lock to prevent user modification.
+For example:
+/org/gnome/desktop/media-handling/automount
+After the settings have been set, run dconf update.</td>
+<td>medium</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>SV-71029</td>
+<td>SRG-OS-000114-GPOS-00059</td>
+<td><i>TBD - Assigned by DISA after STIG release</i></td>
+<td>The operating system must uniquely identify peripherals before establishing a connection.</td>
 <td>CCE-83692-4:Disable GNOME3 Automount Opening</td>
 <td>Without identifying devices, unidentified or unknown devices may be introduced, thereby facilitating malicious activity.
 
@@ -16213,7 +16261,7 @@ The output should indicate the INACTIVE configuration option is set
 to an appropriate integer as shown in the example below:
 $ grep "INACTIVE" /etc/default/useradd
 INACTIVE=
-      Is it the case that the value of INACTIVE is greater than the expected value?
+      Is it the case that the value of INACTIVE is greater than the expected value or is -1?
       </td>
 <td><fixtext xmlns="http://checklists.nist.gov/xccdf/1.1" fixref="F-3773r557190_fix">Configure the operating system to disable account identifiers (individuals, groups, roles, and devices) after 35 days of inactivity.</fixtext></td>
 <td>To specify the number of days after a password expires (which
@@ -16619,57 +16667,6 @@ TMOUT=</td>
 <td>SRG-OS-000163-GPOS-00072</td>
 <td><i>TBD - Assigned by DISA after STIG release</i></td>
 <td>The operating system must terminate all network connections associated with a communications session at the end of the session, or as follows: for in-band management sessions (privileged sessions), the session must be terminated after 10 minutes of inactivity; and for user sessions (non-privileged session), the session must be terminated after 15 minutes of inactivity, except to fulfill documented and validated mission requirements.</td>
-<td>CCE-27433-2:Set SSH Idle Timeout Interval</td>
-<td>Terminating an idle session within a short time period reduces the window of opportunity for unauthorized personnel to take control of a management session enabled on the console or console port that has been left unattended. In addition, quickly terminating an idle session will also free up resources committed by the managed network element. 
-
-Terminating network connections associated with communications sessions includes, for example, de-allocating associated TCP/IP address/port pairs at the operating system level, and de-allocating networking assignments at the application level if multiple application sessions are using a single operating system-level network connection. This does not mean that the operating system terminates all sessions or network access; it only ends the inactive session and releases the resources associated with that session.</td>
-<td xml:lang="en-US">SSH allows administrators to set an idle timeout interval. After this interval
-has passed, the idle user will be automatically logged out.
-<br><br>
-To set an idle timeout interval, edit the following line in <code>/etc/ssh/sshd_config</code> as
-follows:
-<pre>ClientAliveInterval <b><xccdf-1.1:sub xmlns:xccdf-1.1="http://checklists.nist.gov/xccdf/1.1" idref="sshd_idle_timeout_value"></xccdf-1.1:sub></b></pre>
-<br><br>
-The timeout <b>interval</b> is given in seconds. For example, have a timeout
-of 10 minutes, set <b>interval</b> to 600.
-<br><br>
-If a shorter timeout has already been set for the login shell, that value will
-preempt any SSH setting made in <code>/etc/ssh/sshd_config</code>. Keep in mind that
-some processes may stop SSH  from correctly detecting that the user is idle.</td>
-<td>Applicable - Configurable</td>
-<td>Verify the operating system terminates all network connections associated with a communications session at the end of the session, or as follows: for in-band management sessions (privileged sessions), the session must be terminated after 10 minutes of inactivity; and for user sessions (non-privileged session), the session must be terminated after 15 minutes of inactivity, except to fulfill documented and validated mission requirements. 
-
-If it does not, this is a finding.</td>
-<td>Run the following command to see what the timeout interval is:
-$ sudo grep ClientAliveInterval /etc/ssh/sshd_config
-If properly configured, the output should be:
-ClientAliveInterval 
-      Is it the case that it is commented out or not configured properly?
-      </td>
-<td><fixtext xmlns="http://checklists.nist.gov/xccdf/1.1" fixref="F-3784r793151_fix">Configure the operating system to terminate all network connections associated with a communications session at the end of the session, or as follows: for in-band management sessions (privileged sessions), the session must be terminated after 10 minutes of inactivity; and for user sessions (non-privileged session), the session must be terminated after 15 minutes of inactivity, except to fulfill documented and validated mission requirements.</fixtext></td>
-<td>SSH allows administrators to set an idle timeout interval. After this interval
-has passed, the idle user will be automatically logged out.
-
-To set an idle timeout interval, edit the following line in /etc/ssh/sshd_config as
-follows:
-ClientAliveInterval 
-
-The timeout interval is given in seconds. For example, have a timeout
-of 10 minutes, set interval to 600.
-
-If a shorter timeout has already been set for the login shell, that value will
-preempt any SSH setting made in /etc/ssh/sshd_config. Keep in mind that
-some processes may stop SSH  from correctly detecting that the user is idle.</td>
-<td>medium</td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>SV-71125</td>
-<td>SRG-OS-000163-GPOS-00072</td>
-<td><i>TBD - Assigned by DISA after STIG release</i></td>
-<td>The operating system must terminate all network connections associated with a communications session at the end of the session, or as follows: for in-band management sessions (privileged sessions), the session must be terminated after 10 minutes of inactivity; and for user sessions (non-privileged session), the session must be terminated after 15 minutes of inactivity, except to fulfill documented and validated mission requirements.</td>
 <td>CCE-83399-6:Set SSH Client Alive Count Max to zero</td>
 <td>Terminating an idle session within a short time period reduces the window of opportunity for unauthorized personnel to take control of a management session enabled on the console or console port that has been left unattended. In addition, quickly terminating an idle session will also free up resources committed by the managed network element. 
 
@@ -16716,6 +16713,57 @@ value of 0 in
 
 
 /etc/ssh/sshd_config:</td>
+<td>medium</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>SV-71125</td>
+<td>SRG-OS-000163-GPOS-00072</td>
+<td><i>TBD - Assigned by DISA after STIG release</i></td>
+<td>The operating system must terminate all network connections associated with a communications session at the end of the session, or as follows: for in-band management sessions (privileged sessions), the session must be terminated after 10 minutes of inactivity; and for user sessions (non-privileged session), the session must be terminated after 15 minutes of inactivity, except to fulfill documented and validated mission requirements.</td>
+<td>CCE-27433-2:Set SSH Idle Timeout Interval</td>
+<td>Terminating an idle session within a short time period reduces the window of opportunity for unauthorized personnel to take control of a management session enabled on the console or console port that has been left unattended. In addition, quickly terminating an idle session will also free up resources committed by the managed network element. 
+
+Terminating network connections associated with communications sessions includes, for example, de-allocating associated TCP/IP address/port pairs at the operating system level, and de-allocating networking assignments at the application level if multiple application sessions are using a single operating system-level network connection. This does not mean that the operating system terminates all sessions or network access; it only ends the inactive session and releases the resources associated with that session.</td>
+<td xml:lang="en-US">SSH allows administrators to set an idle timeout interval. After this interval
+has passed, the idle user will be automatically logged out.
+<br><br>
+To set an idle timeout interval, edit the following line in <code>/etc/ssh/sshd_config</code> as
+follows:
+<pre>ClientAliveInterval <b><xccdf-1.1:sub xmlns:xccdf-1.1="http://checklists.nist.gov/xccdf/1.1" idref="sshd_idle_timeout_value"></xccdf-1.1:sub></b></pre>
+<br><br>
+The timeout <b>interval</b> is given in seconds. For example, have a timeout
+of 10 minutes, set <b>interval</b> to 600.
+<br><br>
+If a shorter timeout has already been set for the login shell, that value will
+preempt any SSH setting made in <code>/etc/ssh/sshd_config</code>. Keep in mind that
+some processes may stop SSH  from correctly detecting that the user is idle.</td>
+<td>Applicable - Configurable</td>
+<td>Verify the operating system terminates all network connections associated with a communications session at the end of the session, or as follows: for in-band management sessions (privileged sessions), the session must be terminated after 10 minutes of inactivity; and for user sessions (non-privileged session), the session must be terminated after 15 minutes of inactivity, except to fulfill documented and validated mission requirements. 
+
+If it does not, this is a finding.</td>
+<td>Run the following command to see what the timeout interval is:
+$ sudo grep ClientAliveInterval /etc/ssh/sshd_config
+If properly configured, the output should be:
+ClientAliveInterval 
+      Is it the case that it is commented out or not configured properly?
+      </td>
+<td><fixtext xmlns="http://checklists.nist.gov/xccdf/1.1" fixref="F-3784r793151_fix">Configure the operating system to terminate all network connections associated with a communications session at the end of the session, or as follows: for in-band management sessions (privileged sessions), the session must be terminated after 10 minutes of inactivity; and for user sessions (non-privileged session), the session must be terminated after 15 minutes of inactivity, except to fulfill documented and validated mission requirements.</fixtext></td>
+<td>SSH allows administrators to set an idle timeout interval. After this interval
+has passed, the idle user will be automatically logged out.
+
+To set an idle timeout interval, edit the following line in /etc/ssh/sshd_config as
+follows:
+ClientAliveInterval 
+
+The timeout interval is given in seconds. For example, have a timeout
+of 10 minutes, set interval to 600.
+
+If a shorter timeout has already been set for the login shell, that value will
+preempt any SSH setting made in /etc/ssh/sshd_config. Keep in mind that
+some processes may stop SSH  from correctly detecting that the user is idle.</td>
 <td>medium</td>
 <td></td>
 <td></td>
@@ -19234,59 +19282,6 @@ $ sudo rpm --setperms PACKAGENAME</td>
 <td>SRG-OS-000279-GPOS-00109</td>
 <td><i>TBD - Assigned by DISA after STIG release</i></td>
 <td>The operating system must automatically terminate a user session after inactivity time-outs have expired or at shutdown.</td>
-<td>CCE-27433-2:Set SSH Idle Timeout Interval</td>
-<td>Automatic session termination addresses the termination of user-initiated logical sessions in contrast to the termination of network connections that are associated with communications sessions (i.e., network disconnect). A logical session (for local, network, and remote access) is initiated whenever a user (or process acting on behalf of a user) accesses an organizational information system. Such user sessions can be terminated (and thus terminate user access) without terminating network sessions.
-
-Session termination terminates all processes associated with a user's logical session except those processes that are specifically created by the user (i.e., session owner) to continue after the session is terminated.
-
-Conditions or trigger events requiring automatic session termination can include, for example, organization-defined periods of user inactivity, targeted responses to certain types of incidents, and time-of-day restrictions on information system use.
-
-This capability is typically reserved for specific operating system functionality where the system owner, data owner, or organization requires additional assurance.</td>
-<td xml:lang="en-US">SSH allows administrators to set an idle timeout interval. After this interval
-has passed, the idle user will be automatically logged out.
-<br><br>
-To set an idle timeout interval, edit the following line in <code>/etc/ssh/sshd_config</code> as
-follows:
-<pre>ClientAliveInterval <b><xccdf-1.1:sub xmlns:xccdf-1.1="http://checklists.nist.gov/xccdf/1.1" idref="sshd_idle_timeout_value"></xccdf-1.1:sub></b></pre>
-<br><br>
-The timeout <b>interval</b> is given in seconds. For example, have a timeout
-of 10 minutes, set <b>interval</b> to 600.
-<br><br>
-If a shorter timeout has already been set for the login shell, that value will
-preempt any SSH setting made in <code>/etc/ssh/sshd_config</code>. Keep in mind that
-some processes may stop SSH  from correctly detecting that the user is idle.</td>
-<td>Applicable - Configurable</td>
-<td>Verify the operating system automatically terminates a user session after inactivity time-outs have expired or at shutdown. If it does not, this is a finding.</td>
-<td>Run the following command to see what the timeout interval is:
-$ sudo grep ClientAliveInterval /etc/ssh/sshd_config
-If properly configured, the output should be:
-ClientAliveInterval 
-      Is it the case that it is commented out or not configured properly?
-      </td>
-<td><fixtext xmlns="http://checklists.nist.gov/xccdf/1.1" fixref="F-3808r374937_fix">Configure the operating system to automatically terminate a user session after inactivity time-outs have expired or at shutdown.</fixtext></td>
-<td>SSH allows administrators to set an idle timeout interval. After this interval
-has passed, the idle user will be automatically logged out.
-
-To set an idle timeout interval, edit the following line in /etc/ssh/sshd_config as
-follows:
-ClientAliveInterval 
-
-The timeout interval is given in seconds. For example, have a timeout
-of 10 minutes, set interval to 600.
-
-If a shorter timeout has already been set for the login shell, that value will
-preempt any SSH setting made in /etc/ssh/sshd_config. Keep in mind that
-some processes may stop SSH  from correctly detecting that the user is idle.</td>
-<td>medium</td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>SV-71467</td>
-<td>SRG-OS-000279-GPOS-00109</td>
-<td><i>TBD - Assigned by DISA after STIG release</i></td>
-<td>The operating system must automatically terminate a user session after inactivity time-outs have expired or at shutdown.</td>
 <td>CCE-83399-6:Set SSH Client Alive Count Max to zero</td>
 <td>Automatic session termination addresses the termination of user-initiated logical sessions in contrast to the termination of network connections that are associated with communications sessions (i.e., network disconnect). A logical session (for local, network, and remote access) is initiated whenever a user (or process acting on behalf of a user) accesses an organizational information system. Such user sessions can be terminated (and thus terminate user access) without terminating network sessions.
 
@@ -19335,6 +19330,59 @@ value of 0 in
 
 
 /etc/ssh/sshd_config:</td>
+<td>medium</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>SV-71467</td>
+<td>SRG-OS-000279-GPOS-00109</td>
+<td><i>TBD - Assigned by DISA after STIG release</i></td>
+<td>The operating system must automatically terminate a user session after inactivity time-outs have expired or at shutdown.</td>
+<td>CCE-27433-2:Set SSH Idle Timeout Interval</td>
+<td>Automatic session termination addresses the termination of user-initiated logical sessions in contrast to the termination of network connections that are associated with communications sessions (i.e., network disconnect). A logical session (for local, network, and remote access) is initiated whenever a user (or process acting on behalf of a user) accesses an organizational information system. Such user sessions can be terminated (and thus terminate user access) without terminating network sessions.
+
+Session termination terminates all processes associated with a user's logical session except those processes that are specifically created by the user (i.e., session owner) to continue after the session is terminated.
+
+Conditions or trigger events requiring automatic session termination can include, for example, organization-defined periods of user inactivity, targeted responses to certain types of incidents, and time-of-day restrictions on information system use.
+
+This capability is typically reserved for specific operating system functionality where the system owner, data owner, or organization requires additional assurance.</td>
+<td xml:lang="en-US">SSH allows administrators to set an idle timeout interval. After this interval
+has passed, the idle user will be automatically logged out.
+<br><br>
+To set an idle timeout interval, edit the following line in <code>/etc/ssh/sshd_config</code> as
+follows:
+<pre>ClientAliveInterval <b><xccdf-1.1:sub xmlns:xccdf-1.1="http://checklists.nist.gov/xccdf/1.1" idref="sshd_idle_timeout_value"></xccdf-1.1:sub></b></pre>
+<br><br>
+The timeout <b>interval</b> is given in seconds. For example, have a timeout
+of 10 minutes, set <b>interval</b> to 600.
+<br><br>
+If a shorter timeout has already been set for the login shell, that value will
+preempt any SSH setting made in <code>/etc/ssh/sshd_config</code>. Keep in mind that
+some processes may stop SSH  from correctly detecting that the user is idle.</td>
+<td>Applicable - Configurable</td>
+<td>Verify the operating system automatically terminates a user session after inactivity time-outs have expired or at shutdown. If it does not, this is a finding.</td>
+<td>Run the following command to see what the timeout interval is:
+$ sudo grep ClientAliveInterval /etc/ssh/sshd_config
+If properly configured, the output should be:
+ClientAliveInterval 
+      Is it the case that it is commented out or not configured properly?
+      </td>
+<td><fixtext xmlns="http://checklists.nist.gov/xccdf/1.1" fixref="F-3808r374937_fix">Configure the operating system to automatically terminate a user session after inactivity time-outs have expired or at shutdown.</fixtext></td>
+<td>SSH allows administrators to set an idle timeout interval. After this interval
+has passed, the idle user will be automatically logged out.
+
+To set an idle timeout interval, edit the following line in /etc/ssh/sshd_config as
+follows:
+ClientAliveInterval 
+
+The timeout interval is given in seconds. For example, have a timeout
+of 10 minutes, set interval to 600.
+
+If a shorter timeout has already been set for the login shell, that value will
+preempt any SSH setting made in /etc/ssh/sshd_config. Keep in mind that
+some processes may stop SSH  from correctly detecting that the user is idle.</td>
 <td>medium</td>
 <td></td>
 <td></td>
@@ -19405,7 +19453,7 @@ Run the following command to determine the current status of the
 firewalld service:
 $ systemctl is-active firewalld
 If the service is running, it should return the following: active
-      Is it the case that ?
+      Is it the case that the service is not enabled?
       </td>
 <td><fixtext xmlns="http://checklists.nist.gov/xccdf/1.1" fixref="F-3811r374946_fix">Configure the operating system to control remote access methods.</fixtext></td>
 <td>
@@ -19505,7 +19553,7 @@ normal usage of the wireless capability.
 
 Configure the system to disable all wireless network interfaces with the
 following command:
-<pre>$ sudo nmcli radio wifi off</pre>
+<pre>$ sudo nmcli radio all off</pre>
 </td>
 <td>Applicable - Configurable</td>
 <td>Verify the operating system protects wireless access to and from the system using encryption. If it does not, this is a finding.</td>
@@ -19524,7 +19572,7 @@ normal usage of the wireless capability.
 
 Configure the system to disable all wireless network interfaces with the
 following command:
-$ sudo nmcli radio wifi off</td>
+$ sudo nmcli radio all off</td>
 <td>medium</td>
 <td></td>
 <td></td>
@@ -19547,7 +19595,7 @@ normal usage of the wireless capability.
 
 Configure the system to disable all wireless network interfaces with the
 following command:
-<pre>$ sudo nmcli radio wifi off</pre>
+<pre>$ sudo nmcli radio all off</pre>
 </td>
 <td>Applicable - Configurable</td>
 <td>Verify the operating system protects wireless access to the system using authentication of users and/or devices. If it does not, this is a finding.</td>
@@ -19566,7 +19614,7 @@ normal usage of the wireless capability.
 
 Configure the system to disable all wireless network interfaces with the
 following command:
-$ sudo nmcli radio wifi off</td>
+$ sudo nmcli radio all off</td>
 <td>medium</td>
 <td></td>
 <td></td>
@@ -20776,10 +20824,12 @@ Some programs and processes are required to operate at a higher privilege level 
 <td xml:lang="en-US">Verify the system generates an audit record when privileged functions are executed.
 <pre># grep -iw execve <code>/etc/audit/audit.rules</code></pre>
 
+
 <pre>-a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
+
 
 If both the "b32" and "b64" audit rules for "SUID" files are not defined, this is a finding.
 If both the "b32" and "b64" audit rules for "SGID" files are not defined, this is a finding.</td>
@@ -20787,10 +20837,12 @@ If both the "b32" and "b64" audit rules for "SGID" files are not defined, this i
 <td>Verify that the operating system prevents all software from executing at higher privilege levels than users executing the software. If it does not, this is a finding.</td>
 <td>Add or update the following rules in "/etc/audit/rules.d/audit.rules":
 
+
 -a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid
 -a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid
+
 
 The audit daemon must be restarted for the changes to take effect.
 
@@ -20801,10 +20853,12 @@ The audit daemon must be restarted for the changes to take effect.
 <td>Verify the system generates an audit record when privileged functions are executed.
 # grep -iw execve /etc/audit/audit.rules
 
+
 -a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid
 -a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid
+
 
 If both the "b32" and "b64" audit rules for "SUID" files are not defined, this is a finding.
 If both the "b32" and "b64" audit rules for "SGID" files are not defined, this is a finding.</td>
@@ -20823,10 +20877,12 @@ If both the "b32" and "b64" audit rules for "SGID" files are not defined, this i
 <td xml:lang="en-US">Verify the system generates an audit record when privileged functions are executed.
 <pre># grep -iw execve <code>/etc/audit/audit.rules</code></pre>
 
+
 <pre>-a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
+
 
 If both the "b32" and "b64" audit rules for "SUID" files are not defined, this is a finding.
 If both the "b32" and "b64" audit rules for "SGID" files are not defined, this is a finding.</td>
@@ -20834,10 +20890,12 @@ If both the "b32" and "b64" audit rules for "SGID" files are not defined, this i
 <td>Verify that the operating system audits the execution of privileged functions. If it does not, this is a finding.</td>
 <td>Add or update the following rules in "/etc/audit/rules.d/audit.rules":
 
+
 -a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid
 -a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid
+
 
 The audit daemon must be restarted for the changes to take effect.
 
@@ -20848,10 +20906,12 @@ The audit daemon must be restarted for the changes to take effect.
 <td>Verify the system generates an audit record when privileged functions are executed.
 # grep -iw execve /etc/audit/audit.rules
 
+
 -a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid
 -a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid
+
 
 If both the "b32" and "b64" audit rules for "SUID" files are not defined, this is a finding.
 If both the "b32" and "b64" audit rules for "SGID" files are not defined, this is a finding.</td>
@@ -21037,10 +21097,12 @@ This requirement enables organizations to extend or limit auditing as necessary 
 <td xml:lang="en-US">Verify the system generates an audit record when privileged functions are executed.
 <pre># grep -iw execve <code>/etc/audit/audit.rules</code></pre>
 
+
 <pre>-a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
+
 
 If both the "b32" and "b64" audit rules for "SUID" files are not defined, this is a finding.
 If both the "b32" and "b64" audit rules for "SGID" files are not defined, this is a finding.</td>
@@ -21048,10 +21110,12 @@ If both the "b32" and "b64" audit rules for "SGID" files are not defined, this i
 <td>Verify the operating system provides the capability for assigned IMOs/ISSOs or designated SAs to change the auditing to be performed on all operating system components, based on all selectable event criteria in near real time. If it does not, this is a finding.</td>
 <td>Add or update the following rules in "/etc/audit/rules.d/audit.rules":
 
+
 -a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid
 -a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid
+
 
 The audit daemon must be restarted for the changes to take effect.
 
@@ -21062,10 +21126,12 @@ The audit daemon must be restarted for the changes to take effect.
 <td>Verify the system generates an audit record when privileged functions are executed.
 # grep -iw execve /etc/audit/audit.rules
 
+
 -a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid
 -a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid
+
 
 If both the "b32" and "b64" audit rules for "SUID" files are not defined, this is a finding.
 If both the "b32" and "b64" audit rules for "SGID" files are not defined, this is a finding.</td>
@@ -21566,10 +21632,12 @@ Audit reduction is a technique used to reduce the volume of audit records in ord
 <td xml:lang="en-US">Verify the system generates an audit record when privileged functions are executed.
 <pre># grep -iw execve <code>/etc/audit/audit.rules</code></pre>
 
+
 <pre>-a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
+
 
 If both the "b32" and "b64" audit rules for "SUID" files are not defined, this is a finding.
 If both the "b32" and "b64" audit rules for "SGID" files are not defined, this is a finding.</td>
@@ -21577,10 +21645,12 @@ If both the "b32" and "b64" audit rules for "SGID" files are not defined, this i
 <td>Verify the operating system provides an audit reduction capability that supports on-demand audit review and analysis. If it does not, this is a finding.</td>
 <td>Add or update the following rules in "/etc/audit/rules.d/audit.rules":
 
+
 -a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid
 -a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid
+
 
 The audit daemon must be restarted for the changes to take effect.
 
@@ -21591,10 +21661,12 @@ The audit daemon must be restarted for the changes to take effect.
 <td>Verify the system generates an audit record when privileged functions are executed.
 # grep -iw execve /etc/audit/audit.rules
 
+
 -a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid
 -a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid
+
 
 If both the "b32" and "b64" audit rules for "SUID" files are not defined, this is a finding.
 If both the "b32" and "b64" audit rules for "SGID" files are not defined, this is a finding.</td>
@@ -21617,10 +21689,12 @@ This requirement is specific to operating systems with audit reduction capabilit
 <td xml:lang="en-US">Verify the system generates an audit record when privileged functions are executed.
 <pre># grep -iw execve <code>/etc/audit/audit.rules</code></pre>
 
+
 <pre>-a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
+
 
 If both the "b32" and "b64" audit rules for "SUID" files are not defined, this is a finding.
 If both the "b32" and "b64" audit rules for "SGID" files are not defined, this is a finding.</td>
@@ -21628,10 +21702,12 @@ If both the "b32" and "b64" audit rules for "SGID" files are not defined, this i
 <td>Verify the operating system provides an audit reduction capability that supports after-the-fact investigations of security incidents. If it does not, this is a finding.</td>
 <td>Add or update the following rules in "/etc/audit/rules.d/audit.rules":
 
+
 -a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid
 -a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid
+
 
 The audit daemon must be restarted for the changes to take effect.
 
@@ -21642,10 +21718,12 @@ The audit daemon must be restarted for the changes to take effect.
 <td>Verify the system generates an audit record when privileged functions are executed.
 # grep -iw execve /etc/audit/audit.rules
 
+
 -a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid
 -a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid
+
 
 If both the "b32" and "b64" audit rules for "SUID" files are not defined, this is a finding.
 If both the "b32" and "b64" audit rules for "SGID" files are not defined, this is a finding.</td>
@@ -21666,10 +21744,12 @@ Report generation must be capable of generating on-demand (i.e., customizable, a
 <td xml:lang="en-US">Verify the system generates an audit record when privileged functions are executed.
 <pre># grep -iw execve <code>/etc/audit/audit.rules</code></pre>
 
+
 <pre>-a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
+
 
 If both the "b32" and "b64" audit rules for "SUID" files are not defined, this is a finding.
 If both the "b32" and "b64" audit rules for "SGID" files are not defined, this is a finding.</td>
@@ -21677,10 +21757,12 @@ If both the "b32" and "b64" audit rules for "SGID" files are not defined, this i
 <td>Verify the operating system provides a report generation capability that supports on-demand audit review and analysis. If it does not, this is a finding.</td>
 <td>Add or update the following rules in "/etc/audit/rules.d/audit.rules":
 
+
 -a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid
 -a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid
+
 
 The audit daemon must be restarted for the changes to take effect.
 
@@ -21691,10 +21773,12 @@ The audit daemon must be restarted for the changes to take effect.
 <td>Verify the system generates an audit record when privileged functions are executed.
 # grep -iw execve /etc/audit/audit.rules
 
+
 -a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid
 -a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid
+
 
 If both the "b32" and "b64" audit rules for "SUID" files are not defined, this is a finding.
 If both the "b32" and "b64" audit rules for "SGID" files are not defined, this is a finding.</td>
@@ -21715,10 +21799,12 @@ Report generation must be capable of generating on-demand (i.e., customizable, a
 <td xml:lang="en-US">Verify the system generates an audit record when privileged functions are executed.
 <pre># grep -iw execve <code>/etc/audit/audit.rules</code></pre>
 
+
 <pre>-a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
+
 
 If both the "b32" and "b64" audit rules for "SUID" files are not defined, this is a finding.
 If both the "b32" and "b64" audit rules for "SGID" files are not defined, this is a finding.</td>
@@ -21726,10 +21812,12 @@ If both the "b32" and "b64" audit rules for "SGID" files are not defined, this i
 <td>Verify the operating system provides a report generation capability that supports on-demand reporting requirements. If it does not, this is a finding.</td>
 <td>Add or update the following rules in "/etc/audit/rules.d/audit.rules":
 
+
 -a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid
 -a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid
+
 
 The audit daemon must be restarted for the changes to take effect.
 
@@ -21740,10 +21828,12 @@ The audit daemon must be restarted for the changes to take effect.
 <td>Verify the system generates an audit record when privileged functions are executed.
 # grep -iw execve /etc/audit/audit.rules
 
+
 -a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid
 -a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid
+
 
 If both the "b32" and "b64" audit rules for "SUID" files are not defined, this is a finding.
 If both the "b32" and "b64" audit rules for "SGID" files are not defined, this is a finding.</td>
@@ -21764,10 +21854,12 @@ The report generation capability must support after-the-fact investigations of s
 <td xml:lang="en-US">Verify the system generates an audit record when privileged functions are executed.
 <pre># grep -iw execve <code>/etc/audit/audit.rules</code></pre>
 
+
 <pre>-a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
+
 
 If both the "b32" and "b64" audit rules for "SUID" files are not defined, this is a finding.
 If both the "b32" and "b64" audit rules for "SGID" files are not defined, this is a finding.</td>
@@ -21775,10 +21867,12 @@ If both the "b32" and "b64" audit rules for "SGID" files are not defined, this i
 <td>Verify the operating system provides a report generation capability that supports after-the-fact investigations of security incidents. If it does not, this is a finding.</td>
 <td>Add or update the following rules in "/etc/audit/rules.d/audit.rules":
 
+
 -a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid
 -a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid
+
 
 The audit daemon must be restarted for the changes to take effect.
 
@@ -21789,10 +21883,12 @@ The audit daemon must be restarted for the changes to take effect.
 <td>Verify the system generates an audit record when privileged functions are executed.
 # grep -iw execve /etc/audit/audit.rules
 
+
 -a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid
 -a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid
+
 
 If both the "b32" and "b64" audit rules for "SUID" files are not defined, this is a finding.
 If both the "b32" and "b64" audit rules for "SGID" files are not defined, this is a finding.</td>
@@ -21815,10 +21911,12 @@ This requirement is specific to operating systems providing audit reduction capa
 <td xml:lang="en-US">Verify the system generates an audit record when privileged functions are executed.
 <pre># grep -iw execve <code>/etc/audit/audit.rules</code></pre>
 
+
 <pre>-a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
+
 
 If both the "b32" and "b64" audit rules for "SUID" files are not defined, this is a finding.
 If both the "b32" and "b64" audit rules for "SGID" files are not defined, this is a finding.</td>
@@ -21826,10 +21924,12 @@ If both the "b32" and "b64" audit rules for "SGID" files are not defined, this i
 <td>Verify the operating system does not alter original content or time ordering of audit records when it provides an audit reduction capability. If it does not, this is a finding.</td>
 <td>Add or update the following rules in "/etc/audit/rules.d/audit.rules":
 
+
 -a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid
 -a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid
+
 
 The audit daemon must be restarted for the changes to take effect.
 
@@ -21840,10 +21940,12 @@ The audit daemon must be restarted for the changes to take effect.
 <td>Verify the system generates an audit record when privileged functions are executed.
 # grep -iw execve /etc/audit/audit.rules
 
+
 -a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid
 -a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid
+
 
 If both the "b32" and "b64" audit rules for "SUID" files are not defined, this is a finding.
 If both the "b32" and "b64" audit rules for "SGID" files are not defined, this is a finding.</td>
@@ -21866,10 +21968,12 @@ This requirement is specific to operating systems providing report generation ca
 <td xml:lang="en-US">Verify the system generates an audit record when privileged functions are executed.
 <pre># grep -iw execve <code>/etc/audit/audit.rules</code></pre>
 
+
 <pre>-a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
+
 
 If both the "b32" and "b64" audit rules for "SUID" files are not defined, this is a finding.
 If both the "b32" and "b64" audit rules for "SGID" files are not defined, this is a finding.</td>
@@ -21877,10 +21981,12 @@ If both the "b32" and "b64" audit rules for "SGID" files are not defined, this i
 <td>Verify the operating system does not alter original content or time ordering of audit records when it provides a report generation capability. If it does not, this is a finding.</td>
 <td>Add or update the following rules in "/etc/audit/rules.d/audit.rules":
 
+
 -a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid
 -a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid
+
 
 The audit daemon must be restarted for the changes to take effect.
 
@@ -21891,10 +21997,12 @@ The audit daemon must be restarted for the changes to take effect.
 <td>Verify the system generates an audit record when privileged functions are executed.
 # grep -iw execve /etc/audit/audit.rules
 
+
 -a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid
 -a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid
+
 
 If both the "b32" and "b64" audit rules for "SUID" files are not defined, this is a finding.
 If both the "b32" and "b64" audit rules for "SGID" files are not defined, this is a finding.</td>
@@ -22005,10 +22113,12 @@ Time stamps generated by the operating system include date and time. Granularity
 <td xml:lang="en-US">Verify the system generates an audit record when privileged functions are executed.
 <pre># grep -iw execve <code>/etc/audit/audit.rules</code></pre>
 
+
 <pre>-a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
+
 
 If both the "b32" and "b64" audit rules for "SUID" files are not defined, this is a finding.
 If both the "b32" and "b64" audit rules for "SGID" files are not defined, this is a finding.</td>
@@ -22016,10 +22126,12 @@ If both the "b32" and "b64" audit rules for "SGID" files are not defined, this i
 <td>Verify the operating system records time stamps for audit records that meet a minimum granularity of one second for a minimum degree of precision. If it does not, this is a finding.</td>
 <td>Add or update the following rules in "/etc/audit/rules.d/audit.rules":
 
+
 -a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid
 -a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid
+
 
 The audit daemon must be restarted for the changes to take effect.
 
@@ -22030,10 +22142,12 @@ The audit daemon must be restarted for the changes to take effect.
 <td>Verify the system generates an audit record when privileged functions are executed.
 # grep -iw execve /etc/audit/audit.rules
 
+
 -a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid
 -a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid
+
 
 If both the "b32" and "b64" audit rules for "SUID" files are not defined, this is a finding.
 If both the "b32" and "b64" audit rules for "SGID" files are not defined, this is a finding.</td>
@@ -22054,10 +22168,12 @@ Time stamps generated by the operating system include date and time. Time is com
 <td xml:lang="en-US">Verify the system generates an audit record when privileged functions are executed.
 <pre># grep -iw execve <code>/etc/audit/audit.rules</code></pre>
 
+
 <pre>-a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
+
 
 If both the "b32" and "b64" audit rules for "SUID" files are not defined, this is a finding.
 If both the "b32" and "b64" audit rules for "SGID" files are not defined, this is a finding.</td>
@@ -22065,10 +22181,12 @@ If both the "b32" and "b64" audit rules for "SGID" files are not defined, this i
 <td>Verify the operating system records time stamps for audit records that can be mapped to Coordinated Universal Time (UTC) or Greenwich Mean Time (GMT). If it does not, this is a finding.</td>
 <td>Add or update the following rules in "/etc/audit/rules.d/audit.rules":
 
+
 -a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid
 -a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid
+
 
 The audit daemon must be restarted for the changes to take effect.
 
@@ -22079,10 +22197,12 @@ The audit daemon must be restarted for the changes to take effect.
 <td>Verify the system generates an audit record when privileged functions are executed.
 # grep -iw execve /etc/audit/audit.rules
 
+
 -a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid
 -a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid
+
 
 If both the "b32" and "b64" audit rules for "SUID" files are not defined, this is a finding.
 If both the "b32" and "b64" audit rules for "SGID" files are not defined, this is a finding.</td>
@@ -22529,10 +22649,12 @@ Enforcement actions are the methods or mechanisms used to prevent unauthorized c
 <td xml:lang="en-US">Verify the system generates an audit record when privileged functions are executed.
 <pre># grep -iw execve <code>/etc/audit/audit.rules</code></pre>
 
+
 <pre>-a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid</pre>
 <pre>-a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
 <pre>-a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid</pre>
+
 
 If both the "b32" and "b64" audit rules for "SUID" files are not defined, this is a finding.
 If both the "b32" and "b64" audit rules for "SGID" files are not defined, this is a finding.</td>
@@ -22540,10 +22662,12 @@ If both the "b32" and "b64" audit rules for "SGID" files are not defined, this i
 <td>Verify the operating system audits the enforcement actions used to restrict access associated with changes to the system. If it does not, this is a finding.</td>
 <td>Add or update the following rules in "/etc/audit/rules.d/audit.rules":
 
+
 -a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid
 -a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid
+
 
 The audit daemon must be restarted for the changes to take effect.
 
@@ -22554,10 +22678,12 @@ The audit daemon must be restarted for the changes to take effect.
 <td>Verify the system generates an audit record when privileged functions are executed.
 # grep -iw execve /etc/audit/audit.rules
 
+
 -a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid
 -a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid
 -a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid
+
 
 If both the "b32" and "b64" audit rules for "SUID" files are not defined, this is a finding.
 If both the "b32" and "b64" audit rules for "SGID" files are not defined, this is a finding.</td>
@@ -23632,6 +23758,55 @@ to services under the [sssd] section in
 [sssd]
 services = sudo, autofs, pam
 </td>
+<td>medium</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>V-56809</td>
+<td>SRG-OS-000378-GPOS-00163</td>
+<td><i>TBD - Assigned by DISA after STIG release</i></td>
+<td>The operating system must authenticate peripherals before establishing a connection.</td>
+<td>CCE-80122-5:Disable GNOME3 Automounting</td>
+<td>Without authenticating devices, unidentified or unknown devices may be introduced, thereby facilitating malicious activity.
+
+Peripherals include, but are not limited to, such devices as flash drives, external storage, and printers.</td>
+<td xml:lang="en-US">The system's default desktop environment, GNOME3, will mount
+devices and removable media (such as DVDs, CDs and USB flash drives) whenever
+they are inserted into the system. To disable automount within GNOME3, add or set
+<code>automount</code> to <code>false</code> in <code>/etc/dconf/db/local.d/00-security-settings</code>.
+For example:
+<pre>[org/gnome/desktop/media-handling]
+automount=false</pre>
+Once the settings have been added, add a lock to
+<code>/etc/dconf/db/local.d/locks/00-security-settings-lock</code> to prevent user modification.
+For example:
+<pre>/org/gnome/desktop/media-handling/automount</pre>
+After the settings have been set, run <code>dconf update</code>.</td>
+<td>Applicable - Configurable</td>
+<td>Verify the operating system authenticates peripherals before establishing a connection. If it does not, this is a finding.</td>
+<td>These settings can be verified by running the following:
+$ gsettings get org.gnome.desktop.media-handling automount
+If properly configured, the output for automount should be false.
+To ensure that users cannot enable automount in GNOME3, run the following:
+$ grep 'automount' /etc/dconf/db/local.d/locks/*
+If properly configured, the output for automount should be /org/gnome/desktop/media-handling/automount
+      Is it the case that GNOME automounting is not disabled?
+      </td>
+<td><fixtext xmlns="http://checklists.nist.gov/xccdf/1.1" fixref="F-3855r375198_fix">Configure the operating system to authenticate peripherals before establishing a connection.</fixtext></td>
+<td>The system's default desktop environment, GNOME3, will mount
+devices and removable media (such as DVDs, CDs and USB flash drives) whenever
+they are inserted into the system. To disable automount within GNOME3, add or set
+automount to false in /etc/dconf/db/local.d/00-security-settings.
+For example:
+[org/gnome/desktop/media-handling]
+automount=false
+Once the settings have been added, add a lock to
+/etc/dconf/db/local.d/locks/00-security-settings-lock to prevent user modification.
+For example:
+/org/gnome/desktop/media-handling/automount
+After the settings have been set, run dconf update.</td>
 <td>medium</td>
 <td></td>
 <td></td>
@@ -27522,7 +27697,7 @@ normal usage of the wireless capability.
 
 Configure the system to disable all wireless network interfaces with the
 following command:
-<pre>$ sudo nmcli radio wifi off</pre>
+<pre>$ sudo nmcli radio all off</pre>
 </td>
 <td>Applicable - Configurable</td>
 <td>Verify the operating system implements cryptographic mechanisms to prevent unauthorized disclosure of information and/or detect changes to information during transmission unless otherwise protected by alternative physical safeguards, such as, at a minimum, a Protected Distribution System (PDS). 
@@ -27543,7 +27718,7 @@ normal usage of the wireless capability.
 
 Configure the system to disable all wireless network interfaces with the
 following command:
-$ sudo nmcli radio wifi off</td>
+$ sudo nmcli radio all off</td>
 <td>medium</td>
 <td></td>
 <td></td>
@@ -27817,7 +27992,7 @@ use cases.</td>
 <td>Verify the operating system verifies correct operation of all security functions. If it does not, this is a finding.</td>
 <td>Check the file /etc/selinux/config and ensure the following line appears:
 SELINUXTYPE=
-      Is it the case that it does not?
+      Is it the case that SELINUXTYPE is set to the wrong value?
       </td>
 <td><fixtext xmlns="http://checklists.nist.gov/xccdf/1.1" fixref="F-3881r375390_fix">Configure the operating system to verify correct operation of all security functions.</fixtext></td>
 <td>The SELinux targeted policy is appropriate for
@@ -40220,6 +40395,55 @@ in the following directories:
 <td>SRG-OS-000480-GPOS-00227</td>
 <td><i>TBD - Assigned by DISA after STIG release</i></td>
 <td>The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs.</td>
+<td>CCE-80122-5:Disable GNOME3 Automounting</td>
+<td>Configuring the operating system to implement organization-wide security implementation guides and security checklists ensures compliance with federal standards and establishes a common security baseline across DoD that reflects the most restrictive security posture consistent with operational requirements.
+
+Configuration settings are the set of parameters that can be changed in hardware, software, or firmware components of the system that affect the security posture and/or functionality of the system. Security-related parameters are those parameters impacting the security state of the system, including the parameters required to satisfy other security control requirements. Security-related parameters include, for example: registry settings; account, file, directory permission settings; and settings for functions, ports, protocols, services, and remote connections.</td>
+<td xml:lang="en-US">The system's default desktop environment, GNOME3, will mount
+devices and removable media (such as DVDs, CDs and USB flash drives) whenever
+they are inserted into the system. To disable automount within GNOME3, add or set
+<code>automount</code> to <code>false</code> in <code>/etc/dconf/db/local.d/00-security-settings</code>.
+For example:
+<pre>[org/gnome/desktop/media-handling]
+automount=false</pre>
+Once the settings have been added, add a lock to
+<code>/etc/dconf/db/local.d/locks/00-security-settings-lock</code> to prevent user modification.
+For example:
+<pre>/org/gnome/desktop/media-handling/automount</pre>
+After the settings have been set, run <code>dconf update</code>.</td>
+<td>Applicable - Configurable</td>
+<td>Verify the operating system is configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. If it is not, this is a finding.</td>
+<td>These settings can be verified by running the following:
+$ gsettings get org.gnome.desktop.media-handling automount
+If properly configured, the output for automount should be false.
+To ensure that users cannot enable automount in GNOME3, run the following:
+$ grep 'automount' /etc/dconf/db/local.d/locks/*
+If properly configured, the output for automount should be /org/gnome/desktop/media-handling/automount
+      Is it the case that GNOME automounting is not disabled?
+      </td>
+<td><fixtext xmlns="http://checklists.nist.gov/xccdf/1.1" fixref="F-3905r375732_fix">Configure the operating system in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs.</fixtext></td>
+<td>The system's default desktop environment, GNOME3, will mount
+devices and removable media (such as DVDs, CDs and USB flash drives) whenever
+they are inserted into the system. To disable automount within GNOME3, add or set
+automount to false in /etc/dconf/db/local.d/00-security-settings.
+For example:
+[org/gnome/desktop/media-handling]
+automount=false
+Once the settings have been added, add a lock to
+/etc/dconf/db/local.d/locks/00-security-settings-lock to prevent user modification.
+For example:
+/org/gnome/desktop/media-handling/automount
+After the settings have been set, run dconf update.</td>
+<td>medium</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>SV-70851</td>
+<td>SRG-OS-000480-GPOS-00227</td>
+<td><i>TBD - Assigned by DISA after STIG release</i></td>
+<td>The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs.</td>
 <td>CCE-83692-4:Disable GNOME3 Automount Opening</td>
 <td>Configuring the operating system to implement organization-wide security implementation guides and security checklists ensures compliance with federal standards and establishes a common security baseline across DoD that reflects the most restrictive security posture consistent with operational requirements.
 
@@ -41415,7 +41639,20 @@ There must be a resolvable DNS CNAME or Alias record set to "" for logs to be se
 <td>Configuring the operating system to implement organization-wide security implementation guides and security checklists ensures compliance with federal standards and establishes a common security baseline across DoD that reflects the most restrictive security posture consistent with operational requirements.
 
 Configuration settings are the set of parameters that can be changed in hardware, software, or firmware components of the system that affect the security posture and/or functionality of the system. Security-related parameters are those parameters impacting the security state of the system, including the parameters required to satisfy other security control requirements. Security-related parameters include, for example: registry settings; account, file, directory permission settings; and settings for functions, ports, protocols, services, and remote connections.</td>
-<td xml:lang="en-US">Multiple Domain Name System (DNS) Servers should be configured
+<td xml:lang="en-US">
+Determine whether the system is using local or DNS name resolution with the
+following command:
+<pre>$ sudo grep hosts /etc/nsswitch.conf
+hosts: files dns</pre>
+If the DNS entry is missing from the host's line in the "/etc/nsswitch.conf"
+file, the "/etc/resolv.conf" file must be empty.
+Verify the "/etc/resolv.conf" file is empty with the following command:
+<pre>$ sudo ls -al /etc/resolv.conf
+-rw-r--r-- 1 root root 0 Aug 19 08:31 resolv.conf</pre>
+If the DNS entry is found on the host's line of the "/etc/nsswitch.conf" file,
+then verify the following:<br>
+
+Multiple Domain Name System (DNS) Servers should be configured
 in <code>/etc/resolv.conf</code>. This provides redundant name resolution services
 in the event that a domain server crashes. To configure the system to contain
 as least <code>2</code> DNS servers, add a corresponding <code>nameserver
@@ -41434,7 +41671,20 @@ The output should return more than one nameserver entry.
       Is it the case that it does not exist or is not properly configured or less than 2 'nameserver' entries exist?
       </td>
 <td><fixtext xmlns="http://checklists.nist.gov/xccdf/1.1" fixref="F-3905r375732_fix">Configure the operating system in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs.</fixtext></td>
-<td>Multiple Domain Name System (DNS) Servers should be configured
+<td>
+Determine whether the system is using local or DNS name resolution with the
+following command:
+$ sudo grep hosts /etc/nsswitch.conf
+hosts: files dns
+If the DNS entry is missing from the host's line in the "/etc/nsswitch.conf"
+file, the "/etc/resolv.conf" file must be empty.
+Verify the "/etc/resolv.conf" file is empty with the following command:
+$ sudo ls -al /etc/resolv.conf
+-rw-r--r-- 1 root root 0 Aug 19 08:31 resolv.conf
+If the DNS entry is found on the host's line of the "/etc/nsswitch.conf" file,
+then verify the following:
+
+Multiple Domain Name System (DNS) Servers should be configured
 in /etc/resolv.conf. This provides redundant name resolution services
 in the event that a domain server crashes. To configure the system to contain
 as least 2 DNS servers, add a corresponding nameserver
@@ -41505,7 +41755,7 @@ Run the following command to determine the current status of the
 firewalld service:
 $ systemctl is-active firewalld
 If the service is running, it should return the following: active
-      Is it the case that ?
+      Is it the case that the service is not enabled?
       </td>
 <td><fixtext xmlns="http://checklists.nist.gov/xccdf/1.1" fixref="F-3905r375732_fix">Configure the operating system in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs.</fixtext></td>
 <td>
@@ -43963,7 +44213,7 @@ Run the following command to determine the current status of the
 firewalld service:
 $ systemctl is-active firewalld
 If the service is running, it should return the following: active
-      Is it the case that ?
+      Is it the case that the service is not enabled?
       </td>
 <td><fixtext xmlns="http://checklists.nist.gov/xccdf/1.1" fixref="F-3909r375744_fix">Ensure the operating system's application firewall is enabled, if available.</fixtext></td>
 <td>
@@ -43991,7 +44241,7 @@ normal usage of the wireless capability.
 
 Configure the system to disable all wireless network interfaces with the
 following command:
-<pre>$ sudo nmcli radio wifi off</pre>
+<pre>$ sudo nmcli radio all off</pre>
 </td>
 <td>Applicable - Configurable</td>
 <td>Verify the operating system protects the confidentiality and integrity of communications with wireless peripherals. If it does not, this is a finding.</td>
@@ -44010,7 +44260,7 @@ normal usage of the wireless capability.
 
 Configure the system to disable all wireless network interfaces with the
 following command:
-$ sudo nmcli radio wifi off</td>
+$ sudo nmcli radio all off</td>
 <td>medium</td>
 <td></td>
 <td></td>
