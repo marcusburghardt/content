@@ -2207,7 +2207,9 @@ The <code>autofs</code> service can be disabled with the following command:
 <td>The Oracle Linux operating system must remove all software components after updated versions have been installed.</td>
 <td><pre>Previous versions of software components that are not removed from the information
 system after updates have been installed may be exploited by some adversaries.</pre></td>
-<td><pre>
+<td><pre>Verify Oracle Linux 7 removes all software components after updated versions have been installed.
+
+
 To verify that clean_requirements_on_remove is configured properly, run the
 following command:
 $ grep clean_requirements_on_remove /etc/yum.conf
@@ -2235,8 +2237,12 @@ to <code>1</code> in <code>/etc/yum.conf</code>.</pre></td>
 potentially compromised processes to the security policy, which is designed to
 prevent them from causing damage to the system or further elevating their
 privileges.</pre></td>
-<td><pre>Check the file /etc/selinux/config and ensure the following line appears:
-SELINUX=
+<td><pre>Ensure that Oracle Linux 7 verifies correct operation of security functions.
+
+Check if "SELinux" is active and in "" mode with the following command:
+
+$ sudo getenforce
+
       Is it the case that SELINUX is not set to enforcing?
       </pre></td>
 <td><pre>The SELinux state should be set to <code><xccdf-1.1:sub xmlns:xccdf-1.1="http://checklists.nist.gov/xccdf/1.1" idref="var_selinux_state"></xccdf-1.1:sub></code> at
@@ -2260,7 +2266,9 @@ temporarily place non-production systems in <code>permissive</code> mode. In suc
 temporary cases, SELinux policies should be developed, and once work
 is completed, the system should be reconfigured to
 <code><xccdf-1.1:sub xmlns:xccdf-1.1="http://checklists.nist.gov/xccdf/1.1" idref="var_selinux_policy_name"></xccdf-1.1:sub></code>.</pre></td>
-<td><pre>Check the file /etc/selinux/config and ensure the following line appears:
+<td><pre>Ensure that Oracle Linux 7 verifies correct operation of security functions.
+
+Check the file /etc/selinux/config and ensure the following line appears:
 SELINUXTYPE=
       Is it the case that SELINUXTYPE is set to the wrong value?
       </pre></td>
@@ -5278,7 +5286,7 @@ to point to the path for the X.509 certificates used for peer authentication.
 <td>The Oracle Linux operating system must implement virtual address space randomization.</td>
 <td><pre>Address space layout randomization (ASLR) makes it more difficult for an
 attacker to predict the location of attack code they have introduced into a
-process's address space during an attempt at exploitation.  Additionally,
+process's address space during an attempt at exploitation. Additionally,
 ASLR makes it more difficult for an attacker to know the location of
 existing code in order to re-purpose it using return oriented programming
 (ROP) techniques.</pre></td>

@@ -17,10 +17,10 @@
 </tr></thead>
 <tbody><tr>
 <td>389</td>
-<td>46</td>
-<td>343</td>
-<td>88.17%</td>
-<td>OL08-00-010090OL08-00-010100OL08-00-010159OL08-00-010163OL08-00-010180OL08-00-010424OL08-00-010560OL08-00-010572OL08-00-010710OL08-00-010731OL08-00-010741OL08-00-020011OL08-00-020013OL08-00-020015OL08-00-020016OL08-00-020017OL08-00-020018OL08-00-020019OL08-00-020020OL08-00-020021OL08-00-020023OL08-00-020025OL08-00-020026OL08-00-020027OL08-00-020028OL08-00-020031OL08-00-020032OL08-00-020043OL08-00-020080OL08-00-020081OL08-00-020082OL08-00-020261OL08-00-020262OL08-00-020263OL08-00-020264OL08-00-020332OL08-00-030590OL08-00-030620OL08-00-030630OL08-00-030640OL08-00-040020OL08-00-040081OL08-00-040090OL08-00-040137OL08-00-040150OL08-00-040400</td>
+<td>45</td>
+<td>344</td>
+<td>88.43%</td>
+<td>OL08-00-010090OL08-00-010100OL08-00-010159OL08-00-010163OL08-00-010180OL08-00-010424OL08-00-010560OL08-00-010572OL08-00-010710OL08-00-010731OL08-00-010741OL08-00-020011OL08-00-020013OL08-00-020015OL08-00-020016OL08-00-020017OL08-00-020018OL08-00-020019OL08-00-020020OL08-00-020021OL08-00-020023OL08-00-020025OL08-00-020026OL08-00-020027OL08-00-020028OL08-00-020031OL08-00-020032OL08-00-020080OL08-00-020081OL08-00-020082OL08-00-020261OL08-00-020262OL08-00-020263OL08-00-020264OL08-00-020332OL08-00-030590OL08-00-030620OL08-00-030630OL08-00-030640OL08-00-040020OL08-00-040081OL08-00-040090OL08-00-040137OL08-00-040150OL08-00-040400</td>
 </tr></tbody>
 </table></div>
 <style type="text/css">
@@ -830,8 +830,12 @@ $ sudo yum erase krb5-workstation</pre></pre></td>
 potentially compromised processes to the security policy, which is designed to
 prevent them from causing damage to the system or further elevating their
 privileges.</pre></td>
-<td><pre>Check the file /etc/selinux/config and ensure the following line appears:
-SELINUX=
+<td><pre>Ensure that Oracle Linux 8 verifies correct operation of security functions.
+
+Check if "SELinux" is active and in "" mode with the following command:
+
+$ sudo getenforce
+
       Is it the case that SELINUX is not set to enforcing?
       </pre></td>
 <td><pre>The SELinux state should be set to <code><xccdf-1.1:sub xmlns:xccdf-1.1="http://checklists.nist.gov/xccdf/1.1" idref="var_selinux_state"></xccdf-1.1:sub></code> at
@@ -2110,7 +2114,7 @@ Run the following command to update command line for already installed kernels:<
 <td>OL 8 must implement address space layout randomization (ASLR) to protect its memory from unauthorized code execution.</td>
 <td><pre>Address space layout randomization (ASLR) makes it more difficult for an
 attacker to predict the location of attack code they have introduced into a
-process's address space during an attempt at exploitation.  Additionally,
+process's address space during an attempt at exploitation. Additionally,
 ASLR makes it more difficult for an attacker to know the location of
 existing code in order to re-purpose it using return oriented programming
 (ROP) techniques.</pre></td>
@@ -2148,7 +2152,9 @@ To make sure that the setting is persistent, add the following line to a file in
 <td>YUM must remove all software components after updated versions have been installed on OL 8.</td>
 <td><pre>Previous versions of software components that are not removed from the information
 system after updates have been installed may be exploited by some adversaries.</pre></td>
-<td><pre>
+<td><pre>Verify Oracle Linux 8 removes all software components after updated versions have been installed.
+
+
 To verify that clean_requirements_on_remove is configured properly, run the
 following command:
 $ grep clean_requirements_on_remove /etc/yum.conf
@@ -2181,7 +2187,9 @@ temporarily place non-production systems in <code>permissive</code> mode. In suc
 temporary cases, SELinux policies should be developed, and once work
 is completed, the system should be reconfigured to
 <code><xccdf-1.1:sub xmlns:xccdf-1.1="http://checklists.nist.gov/xccdf/1.1" idref="var_selinux_policy_name"></xccdf-1.1:sub></code>.</pre></td>
-<td><pre>Check the file /etc/selinux/config and ensure the following line appears:
+<td><pre>Ensure that Oracle Linux 8 verifies correct operation of security functions.
+
+Check the file /etc/selinux/config and ensure the following line appears:
 SELINUXTYPE=
       Is it the case that SELINUXTYPE is set to the wrong value?
       </pre></td>
@@ -3944,14 +3952,34 @@ automatic session locking. It should not be listed in
 </tr>
 <tr>
 <td>V-248678</td>
-<td></td>
+<td>58</td>
 <td>medium</td>
 <td>OL 8 must enable a user session lock until that user reestablishes access using established identification and authentication procedures for command line sessions.</td>
-<td><pre></pre></td>
-<td><pre></pre></td>
-<td><pre></pre></td>
+<td><pre>A session lock is a temporary action taken when a user stops work and
+moves away from the immediate physical vicinity of the information
+system but does not want to log out because of the temporary nature of
+the absence.
+
+The session lock is implemented at the point where session activity can
+be determined.
+
+Regardless of where the session lock is determined and implemented,
+once invoked, the session lock must remain in place until the user
+reauthenticates. No other activity aside from reauthentication must
+unlock the system.</pre></td>
+<td><pre>
+Run the following command to determine if the kbd package is installed:
+$ rpm -q kbd
+      Is it the case that the package is not installed?
+      </pre></td>
+<td><pre>The Oracle Linux 8 operating system must have vlock installed to allow for session locking.
+
+
+The <code>kbd</code> package can be installed with the following command:
+<pre>
+$ sudo yum install kbd</pre></pre></td>
 <td>OL08-00-020043</td>
-<td>Missing Rule</td>
+<td>vlock_installed</td>
 </tr>
 <tr>
 <td>V-248679</td>
@@ -9987,11 +10015,11 @@ To make sure that the setting is persistent, add the following line to a file in
 <td>366</td>
 <td>medium</td>
 <td>OL 8 must restrict exposed kernel pointer addresses access.</td>
-<td><pre>Exposing kernel pointers (through procfs or <code>seq_printf()</code>) exposes
-kernel writeable structures that can contain functions pointers. If a write vulnereability occurs
-in the kernel allowing a write access to any of this structure, the kernel can be compromise. This
-option disallow any program withtout the CAP_SYSLOG capability from getting the kernel pointers addresses,
-replacing them with 0.</pre></td>
+<td><pre>Exposing kernel pointers (through procfs or <code>seq_printf()</code>) exposes kernel
+writeable structures which may contain functions pointers. If a write vulnerability
+occurs in the kernel, allowing write access to any of this structure, the kernel can
+be compromised. This option disallow any program without the CAP_SYSLOG capability
+to get the addresses of kernel pointers by replacing them with 0.</pre></td>
 <td><pre>The runtime status of the kernel.kptr_restrict kernel parameter can be queried
 by running the following command:
 $ sysctl kernel.kptr_restrict
