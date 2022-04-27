@@ -1286,7 +1286,7 @@ is critical that the user re-authenticate.</pre></td>
 <td><pre>To determine if NOPASSWD has been configured for sudo, run the following command:
 $ sudo grep -ri nopasswd /etc/sudoers /etc/sudoers.d/
 The command should return no output.
-      Is it the case that nopasswd is enabled in sudo?
+      Is it the case that nopasswd is specified in the sudo config files?
       </pre></td>
 <td><pre>The sudo <code>NOPASSWD</code> tag, when specified, allows a user to execute
 commands using sudo without having to authenticate. This should be disabled
@@ -1403,7 +1403,7 @@ is critical that the user re-authenticate.</pre></td>
 <td><pre>To determine if !authenticate has not been configured for sudo, run the following command:
 $ sudo grep -r \!authenticate /etc/sudoers /etc/sudoers.d/
 The command should return no output.
-      Is it the case that !authenticate is enabled in sudo?
+      Is it the case that !authenticate is specified in the sudo config files?
       </pre></td>
 <td><pre>The sudo <code>!authenticate</code> option, when specified, allows a user to execute commands using
 sudo without having to authenticate. This should be disabled by making sure that the
@@ -1977,7 +1977,7 @@ The output should return something similar to the following:
 
 
 NOTE: The usage of special cron times, such as @daily or @weekly, is acceptable.
-      Is it the case that AIDE is not configured to periodicly scan?
+      Is it the case that AIDE is not configured to scan periodically?
       </pre></td>
 <td><pre>At a minimum, AIDE should be configured to run a weekly scan.
 To implement a daily execution of AIDE at 4:05am using cron, add the following line to <code>/etc/crontab</code>:
@@ -3166,7 +3166,7 @@ run the command:
 $ ls -lL /etc/cron.allow
 If properly configured, the output should indicate the following owner:
 root
-      Is it the case that /etc/cron.allow has owner root?
+      Is it the case that /etc/cron.allow does not have an owner of root?
       </pre></td>
 <td><pre>If <code>/etc/cron.allow</code> exists, it must be owned by <code>root</code>.
 
@@ -3188,7 +3188,7 @@ run the command:
 $ ls -lL /etc/cron.allow
 If properly configured, the output should indicate the following group-owner:
 root
-      Is it the case that /etc/cron.allow has group owner root?
+      Is it the case that /etc/cron.allow does not have a group owner of root?
       </pre></td>
 <td><pre>If <code>/etc/cron.allow</code> exists, it must be group-owned by <code>root</code>.
 
@@ -4156,7 +4156,7 @@ utility to read audit rules during daemon startup, add the following lines to
 as an attacker attempting to remove evidence of an intrusion.</pre></td>
 <td><pre>To verify that auditing is configured for system administrator actions, run the following command:
 $ sudo auditctl -l | grep "watch=/var/run/faillock\|-w /var/run/faillock"
-      Is it the case that there is not output?
+      Is it the case that there is no output?
       </pre></td>
 <td><pre>The audit system already collects login information for all users
 and root. If the <code>auditd</code> daemon is configured to use the
@@ -5494,7 +5494,7 @@ Run the following command to determine the current status of the
 sshd service:
 $ systemctl is-active sshd
 If the service is running, it should return the following: active
-      Is it the case that ?
+      Is it the case that sshd service is disabled?
       </pre></td>
 <td><pre>The SSH server service, sshd, is commonly needed.
 
@@ -6998,7 +6998,7 @@ log_file=/var/log/audit/audit.log
 $ sudo stat -c "%n %a" /var/log/audit/*
 $ sudo ls -l /var/log/audit
 Audit logs must be mode 0640 or less permissive.
-      Is it the case that any are more permissive?
+      Is it the case that any permissions are more permissive?
       </pre></td>
 <td><pre>If <code>log_group</code> in <code>/etc/audit/auditd.conf</code> is set to a group other than the <code>root</code>
 group account, change the mode of the audit log files with the following command:
