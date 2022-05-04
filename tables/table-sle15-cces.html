@@ -235,7 +235,7 @@ is not commented out or superseded by later includes:
 OpenSSL is supported by crypto policy, but the OpenSSL configuration may be
 set up to ignore it.
 To check that Crypto Policies settings are configured correctly, you have to examine the OpenSSL config file
-available under <code>/etc/pki/tls/openssl.cnf</code>.
+available under <code>/etc/ssl/openssl.cnf</code>.
 This file has the <code>ini</code> format, and it enables crypto policy support
 if there is a <code>[ crypto_policy ]</code> section that contains the <code>.include /etc/crypto-policies/back-ends/opensslcnf.config</code> directive.</td>
 </tr>
@@ -494,11 +494,7 @@ For example, to configure the system for a 15 minute delay, add the following to
 <code>/etc/dconf/db/local.d/00-security-settings</code>:
 <pre>[org/gnome/desktop/session]
 idle-delay=uint32 900</pre>
-Once the setting has been added, add a lock to
-<code>/etc/dconf/db/local.d/locks/00-security-settings-lock</code> to prevent user modification.
-For example:
-<pre>/org/gnome/desktop/session/idle-delay</pre>
-After the settings have been set, run <code>dconf update</code>.</td>
+</td>
 </tr>
 <tr>
 <td>CCE-85766-4</td>
@@ -701,6 +697,14 @@ $ sudo zypper install nss-tools</pre>
 </td>
 </tr>
 <tr>
+<td>CCE-91163-6</td>
+<td>Install dnf-automatic Package</td>
+<td>The <code>dnf-automatic</code> package can be installed with the following command:
+<pre>
+$ sudo zypper install dnf-automatic</pre>
+</td>
+</tr>
+<tr>
 <td>CCE-85551-0</td>
 <td>Ensure zypper Removes Previous Package Versions</td>
 <td>
@@ -713,6 +717,18 @@ previous software components after updating, set the <code>solver.upgradeRemoveD
 to <code>1</code> in <code>/etc/zypp/zypp.conf</code>.</td>
 </tr>
 <tr>
+<td>CCE-91165-1</td>
+<td>Configure dnf-automatic to Install Available Updates Automatically</td>
+<td>To ensure that the packages comprising the available updates will be automatically installed by <code>dnf-automatic</code>, set <code>apply_updates</code> to <code>yes</code> under <code>[commands]</code> section in <code>/etc/dnf/automatic.conf</code>.</td>
+</tr>
+<tr>
+<td>CCE-91166-9</td>
+<td>Configure dnf-automatic to Install Only Security Updates</td>
+<td>To configure <code>dnf-automatic</code> to install only security updates
+automatically, set <code>upgrade_type</code> to <code>security</code> under
+<code>[commands]</code> section in <code>/etc/dnf/automatic.conf</code>.</td>
+</tr>
+<tr>
 <td>CCE-83290-7</td>
 <td>Ensure gpgcheck Enabled In Main zypper Configuration</td>
 <td>The <code>gpgcheck</code> option controls whether
@@ -722,6 +738,14 @@ them, ensure the following line appears in <code>/etc/zypp/zypp.conf</code> in
 the <code>[main]</code> section:
 <pre>gpgcheck=1</pre>
 </td>
+</tr>
+<tr>
+<td>CCE-91167-7</td>
+<td>Ensure gpgcheck Enabled for Local Packages</td>
+<td>
+<code>zypper</code> should be configured to verify the signature(s) of local packages
+prior to installation. To configure <code>zypper</code> to verify signatures of local
+packages, set the <code>localpkg_gpgcheck</code> to <code>1</code> in <code>/etc/zypp/zypp.conf</code>.</td>
 </tr>
 <tr>
 <td>CCE-85797-9</td>
@@ -765,6 +789,14 @@ security updates:
 <br><br>
 NOTE: U.S. Defense systems are required to be patched within 30 days or sooner as local policy
 dictates.</td>
+</tr>
+<tr>
+<td>CCE-91164-4</td>
+<td>Enable dnf-automatic Timer</td>
+<td>
+The <code>dnf-automatic</code> timer can be enabled with the following command:
+<pre>$ sudo systemctl enable dnf-automatic.timer</pre>
+</td>
 </tr>
 <tr>
 <td>CCE-83262-6</td>
@@ -1069,6 +1101,61 @@ is at least <xccdf-1.1:sub xmlns:xccdf-1.1="http://checklists.nist.gov/xccdf/1.1
 </td>
 </tr>
 <tr>
+<td>CCE-85842-3</td>
+<td>Lock Accounts After Failed Password Attempts</td>
+<td>This rule configures the system to lock out accounts after a number of incorrect login attempts
+using <code>pam_faillock.so</code>.
+
+pam_faillock.so module requires multiple entries in pam files. These entries must be carefully
+defined to work as expected. In order to avoid any errors when manually editing these files,
+it is recommended to use the appropriate tools, such as <code>authselect</code> or <code>authconfig</code>,
+depending on the OS version.</td>
+</tr>
+<tr>
+<td>CCE-91171-9</td>
+<td>Configure the root Account for Failed Password Attempts</td>
+<td>This rule configures the system to lock out the <code>root</code> account after a number of
+incorrect login attempts using <code>pam_faillock.so</code>.
+
+pam_faillock.so module requires multiple entries in pam files. These entries must be carefully
+defined to work as expected. In order to avoid any errors when manually editing these files,
+it is recommended to use the appropriate tools, such as <code>authselect</code> or <code>authconfig</code>,
+depending on the OS version.</td>
+</tr>
+<tr>
+<td>CCE-91169-3</td>
+<td>Set Interval For Counting Failed Password Attempts</td>
+<td>Utilizing <code>pam_faillock.so</code>, the <code>fail_interval</code> directive configures the system
+to lock out an account after a number of incorrect login attempts within a specified time
+period. First make sure the feature is enabled using the following command:
+<br><br>
+
+<ul><li><pre>authselect enable-feature with-faillock</pre></li></ul>
+<br>
+Then edit the <code>/etc/security/faillock.conf</code> file as follows:
+<br><br>
+<ul>
+<li> add, uncomment or edit the following line:
+<pre>fail_interval = <xccdf-1.1:sub xmlns:xccdf-1.1="http://checklists.nist.gov/xccdf/1.1" idref="var_accounts_passwords_pam_faillock_fail_interval"></xccdf-1.1:sub></pre>
+</li>
+<li> add or uncomment the following line:
+<pre>silent</pre>
+</li>
+</ul>
+</td>
+</tr>
+<tr>
+<td>CCE-85841-5</td>
+<td>Set Lockout Time for Failed Password Attempts</td>
+<td>This rule configures the system to lock out accounts during a specified time period after a
+number of incorrect login attempts using <code>pam_faillock.so</code>.
+
+pam_faillock.so module requires multiple entries in pam files. These entries must be carefully
+defined to work as expected. In order to avoid any errors when manually editing these files,
+it is recommended to use the appropriate tools, such as <code>authselect</code> or <code>authconfig</code>,
+depending on the OS version.</td>
+</tr>
+<tr>
 <td>CCE-85554-4</td>
 <td>Set Deny For Failed Password Attempts</td>
 <td>The SUSE Linux Enterprise 15 operating system must lock an account after - at most - <xccdf-1.1:sub xmlns:xccdf-1.1="http://checklists.nist.gov/xccdf/1.1" idref="var_password_pam_tally2"></xccdf-1.1:sub>
@@ -1170,7 +1257,7 @@ minimum characters required in a password. Add <code>minlen=<xccdf-1.1:sub xmlns
 after pam_pwquality to set minimum password length requirements.</td>
 </tr>
 <tr>
-<td></td>
+<td>CCE-91157-8</td>
 <td>Ensure PAM Enforces Password Requirements - Minimum Special Characters</td>
 <td>The pam_pwquality module's <code>ocredit=</code> parameter controls requirements for
 usage of special (or "other") characters in a password. When set to a negative number,
@@ -1603,7 +1690,7 @@ environments. The DoD requirement is 1.
 The profile requirement is <code><xccdf-1.1:sub xmlns:xccdf-1.1="http://checklists.nist.gov/xccdf/1.1" idref="var_accounts_minimum_age_login_defs"></xccdf-1.1:sub></code>.</td>
 </tr>
 <tr>
-<td></td>
+<td>CCE-91168-5</td>
 <td>Set Password Minimum Length in login.defs</td>
 <td>To specify password length requirements for new accounts, edit the file
 <code>/etc/login.defs</code> and add or correct the following line:
@@ -1667,6 +1754,28 @@ Password hashes <code>!</code> or <code>*</code> indicate inactive accounts not
 available for logon and are not evaluated.
 If any interactive user password hash does not begin with <code>$6</code>,
 this is a finding.</td>
+</tr>
+<tr>
+<td>CCE-91173-5</td>
+<td>Set number of Password Hashing Rounds - password-auth</td>
+<td>Configure the number or rounds for the password hashing algorithm. This can be
+accomplished by using the <code>rounds</code> option for the <code>pam_unix</code> PAM module.
+<br><br>
+In file <code>/etc/pam.d/password-auth</code> append <code>rounds=<xccdf-1.1:sub xmlns:xccdf-1.1="http://checklists.nist.gov/xccdf/1.1" idref="var_password_pam_unix_rounds"></xccdf-1.1:sub></code>
+to the <code>pam_unix.so</code> file, as shown below:
+<pre>password sufficient pam_unix.so <i>...existing_options...</i> rounds=<xccdf-1.1:sub xmlns:xccdf-1.1="http://checklists.nist.gov/xccdf/1.1" idref="var_password_pam_unix_rounds"></xccdf-1.1:sub></pre>
+The system's default number of rounds is 5000.</td>
+</tr>
+<tr>
+<td>CCE-91172-7</td>
+<td>Set number of Password Hashing Rounds - system-auth</td>
+<td>Configure the number or rounds for the password hashing algorithm. This can be
+accomplished by using the <code>rounds</code> option for the <code>pam_unix</code> PAM module.
+<br><br>
+In file <code>/etc/pam.d/system-auth</code> append <code>rounds=<xccdf-1.1:sub xmlns:xccdf-1.1="http://checklists.nist.gov/xccdf/1.1" idref="var_password_pam_unix_rounds"></xccdf-1.1:sub></code>
+to the <code>pam_unix.so</code> file, as shown below:
+<pre>password sufficient pam_unix.so <i>...existing_options...</i> rounds=<xccdf-1.1:sub xmlns:xccdf-1.1="http://checklists.nist.gov/xccdf/1.1" idref="var_password_pam_unix_rounds"></xccdf-1.1:sub></pre>
+The system's default number of rounds is 5000.</td>
 </tr>
 <tr>
 <td>CCE-85847-2</td>
@@ -2901,11 +3010,11 @@ of the <code>semanage</code> command for all users and root. If the <code>auditd
 daemon is configured to use the <code>augenrules</code> program to read audit rules
 during daemon startup (the default), add the following lines to a file with suffix
 <code>.rules</code> in the directory <code>/etc/audit/rules.d</code>:
-<pre>-a always,exit -F path=/usr/sbin/semanage -F auid&gt;=1000 -F auid!=unset -F key=privileged</pre>
+<pre>-a always,exit -F path=/usr/sbin/semanage -F perm=x -F auid&gt;=1000 -F auid!=unset -F key=privileged</pre>
 If the <code>auditd</code> daemon is configured to use the <code>auditctl</code>
 utility to read audit rules during daemon startup, add the following lines to
 <code>/etc/audit/audit.rules</code> file:
-<pre>-a always,exit -F path=/usr/sbin/semanage -F auid&gt;=1000 -F auid!=unset -F key=privileged</pre>
+<pre>-a always,exit -F path=/usr/sbin/semanage -F perm=x -F auid&gt;=1000 -F auid!=unset -F key=privileged</pre>
 </td>
 </tr>
 <tr>
@@ -2916,11 +3025,11 @@ of the <code>setsebool</code> command for all users and root. If the <code>audit
 daemon is configured to use the <code>augenrules</code> program to read audit rules
 during daemon startup (the default), add the following lines to a file with suffix
 <code>.rules</code> in the directory <code>/etc/audit/rules.d</code>:
-<pre>-a always,exit -F path=/usr/sbin/setsebool -F auid&gt;=1000 -F auid!=unset -F key=privileged</pre>
+<pre>-a always,exit -F path=/usr/sbin/setsebool -F perm=x -F auid&gt;=1000 -F auid!=unset -F key=privileged</pre>
 If the <code>auditd</code> daemon is configured to use the <code>auditctl</code>
 utility to read audit rules during daemon startup, add the following lines to
 <code>/etc/audit/audit.rules</code> file:
-<pre>-a always,exit -F path=/usr/sbin/setsebool -F auid&gt;=1000 -F auid!=unset -F key=privileged</pre>
+<pre>-a always,exit -F path=/usr/sbin/setsebool -F perm=x -F auid&gt;=1000 -F auid!=unset -F key=privileged</pre>
 </td>
 </tr>
 <tr>
@@ -3234,7 +3343,7 @@ The operating system must generate audit records for all uses of the <code>renam
 Without generating audit records specific to the security and mission needs of the organization, it would be 
 difficult to establish, correlate, and investigate the events relating to an incident or identify those responsible for one.
 Audit records can be generated from various components within the information system (e.g., module or policy filter).
-Add or update the following lines to <code>/etc/audit/rules.d/audit.rules</code> to configure the the operating system to generate 
+Add or update the following lines to <code>/etc/audit/rules.d/audit.rules</code> to configure the operating system to generate 
 an audit record for all uses of the <code>renameat</code> system call:  
 <pre>
 -a always,exit -F arch=b32 -S renameat -F auid&gt;=1000 -F auid!=4294967295 -k perm_mod
@@ -3249,7 +3358,7 @@ an audit record for all uses of the <code>renameat</code> system call:
 Without generating audit records specific to the security and mission needs of the organization, it would be 
 difficult to establish, correlate, and investigate the events relating to an incident or identify those responsible for one.
 Audit records can be generated from various components within the information system (e.g., module or policy filter).
-Add or update the following lines to <code>/etc/audit/rules.d/audit.rules</code> to configure the the operating system to generate 
+Add or update the following lines to <code>/etc/audit/rules.d/audit.rules</code> to configure the operating system to generate 
 an audit record for all uses of the <code>renameat2</code> system call:  
 <pre>
 -a always,exit -F arch=b32 -S renameat2 -F auid&gt;=1000 -F auid!=-1 -k perm_mod
@@ -3292,7 +3401,7 @@ The operating system must generate audit records for all uses of the <code>unlin
 Without generating audit records specific to the security and mission needs of the organization, it would be 
 difficult to establish, correlate, and investigate the events relating to an incident or identify those responsible for one.
 Audit records can be generated from various components within the information system (e.g., module or policy filter).
-Add or update the following lines to <code>/etc/audit/rules.d/audit.rules</code> to configure the the operating system to generate 
+Add or update the following lines to <code>/etc/audit/rules.d/audit.rules</code> to configure the operating system to generate 
 an audit record for all uses of the <code>unlink</code> system call:  
 <pre>
 -a always,exit -F arch=b32 -S unlink -F auid&gt;=1000 -F auid!=-1 -k perm_mod
@@ -3307,7 +3416,7 @@ The operating system must generate audit records for all uses of the <code>unlin
 Without generating audit records specific to the security and mission needs of the organization, it would be 
 difficult to establish, correlate, and investigate the events relating to an incident or identify those responsible for one.
 Audit records can be generated from various components within the information system (e.g., module or policy filter).
-Add or update the following lines to <code>/etc/audit/rules.d/audit.rules</code> to configure the the operating system to generate 
+Add or update the following lines to <code>/etc/audit/rules.d/audit.rules</code> to configure the operating system to generate 
 an audit record for all uses of the <code>unlinkat</code> system call:  
 <pre>
 -a always,exit -F arch=b32 -S unlinkat -F auid&gt;=1000 -F auid!=-1 -k perm_mod
@@ -3675,11 +3784,11 @@ privileged commands for all users and root. If the <code>auditd</code> daemon is
 configured to use the <code>augenrules</code> program to read audit rules during
 daemon startup (the default), add a line of the following form to a file with
 suffix <code>.rules</code> in the directory <code>/etc/audit/rules.d</code>:
-<pre>-a always,exit -F path=/usr/sbin/postdrop -F auid&gt;=1000 -F auid!=unset -F key=privileged</pre>
+<pre>-a always,exit -F path=/usr/sbin/postdrop -F perm=x -F auid&gt;=1000 -F auid!=unset -F key=privileged</pre>
 If the <code>auditd</code> daemon is configured to use the <code>auditctl</code>
 utility to read audit rules during daemon startup, add a line of the following
 form to <code>/etc/audit/audit.rules</code>:
-<pre>-a always,exit -F path=/usr/sbin/postdrop -F auid&gt;=1000 -F auid!=unset -F key=privileged</pre>
+<pre>-a always,exit -F path=/usr/sbin/postdrop -F perm=x -F auid&gt;=1000 -F auid!=unset -F key=privileged</pre>
 </td>
 </tr>
 <tr>
@@ -3690,11 +3799,11 @@ privileged commands for all users and root. If the <code>auditd</code> daemon is
 configured to use the <code>augenrules</code> program to read audit rules during
 daemon startup (the default), add a line of the following form to a file with
 suffix <code>.rules</code> in the directory <code>/etc/audit/rules.d</code>:
-<pre>-a always,exit -F path=/usr/sbin/postqueue -F auid&gt;=1000 -F auid!=unset -F key=privileged</pre>
+<pre>-a always,exit -F path=/usr/sbin/postqueue -F perm=x -F auid&gt;=1000 -F auid!=unset -F key=privileged</pre>
 If the <code>auditd</code> daemon is configured to use the <code>auditctl</code>
 utility to read audit rules during daemon startup, add a line of the following
 form to <code>/etc/audit/audit.rules</code>:
-<pre>-a always,exit -F path=/usr/sbin/postqueue -F auid&gt;=1000 -F auid!=unset -F key=privileged</pre>
+<pre>-a always,exit -F path=/usr/sbin/postqueue -F perm=x -F auid&gt;=1000 -F auid!=unset -F key=privileged</pre>
 </td>
 </tr>
 <tr>
@@ -3836,11 +3945,11 @@ privileged commands for all users and root. If the <code>auditd</code> daemon is
 configured to use the <code>augenrules</code> program to read audit rules during
 daemon startup (the default), add a line of the following form to a file with
 suffix <code>.rules</code> in the directory <code>/etc/audit/rules.d</code>:
-<pre>-a always,exit -F path=/usr/sbin/userhelper -F auid&gt;=1000 -F auid!=unset -F key=privileged</pre>
+<pre>-a always,exit -F path=/usr/sbin/userhelper -F perm=x -F auid&gt;=1000 -F auid!=unset -F key=privileged</pre>
 If the <code>auditd</code> daemon is configured to use the <code>auditctl</code>
 utility to read audit rules during daemon startup, add a line of the following
 form to <code>/etc/audit/audit.rules</code>:
-<pre>-a always,exit -F path=/usr/sbin/userhelper -F auid&gt;=1000 -F auid!=unset -F key=privileged</pre>
+<pre>-a always,exit -F path=/usr/sbin/userhelper -F perm=x -F auid&gt;=1000 -F auid!=unset -F key=privileged</pre>
 </td>
 </tr>
 <tr>
@@ -5104,13 +5213,13 @@ The configuration that was used to build kernel is available at <code>/boot/conf
     </td>
 </tr>
 <tr>
-<td></td>
+<td>CCE-91161-0</td>
 <td>Ensure rsyslog is Installed</td>
 <td>Rsyslog is installed by default. The <code>rsyslog</code> package can be installed with the following command: <pre> $ sudo zypper install rsyslog</pre>
 </td>
 </tr>
 <tr>
-<td></td>
+<td>CCE-91162-8</td>
 <td>Enable rsyslog Service</td>
 <td>The <code>rsyslog</code> service provides syslog-style logging by default on SUSE Linux Enterprise 15.
 
@@ -5702,7 +5811,7 @@ relatively new transport layer protocol, designed to support
 streaming media and telephony.
 
 To configure the system to prevent the <code>dccp</code>
-kernel module from being loaded, add the following line to a file in the directory <code>/etc/modprobe.d</code>:
+kernel module from being loaded, add the following line to the file <code>/etc/modprobe.d/dccp.conf</code>:
 <pre>install dccp /bin/true</pre>
 </td>
 </tr>
@@ -5714,7 +5823,7 @@ layer protocol designed to provide reliable high-bandwidth,
 low-latency communications between nodes in a cluster.
 
 To configure the system to prevent the <code>rds</code>
-kernel module from being loaded, add the following line to a file in the directory <code>/etc/modprobe.d</code>:
+kernel module from being loaded, add the following line to the file <code>/etc/modprobe.d/rds.conf</code>:
 <pre>install rds /bin/true</pre>
 </td>
 </tr>
@@ -5727,7 +5836,7 @@ message-oriented communication, with several streams of messages
 within one connection.
 
 To configure the system to prevent the <code>sctp</code>
-kernel module from being loaded, add the following line to a file in the directory <code>/etc/modprobe.d</code>:
+kernel module from being loaded, add the following line to the file <code>/etc/modprobe.d/sctp.conf</code>:
 <pre>install sctp /bin/true</pre>
 </td>
 </tr>
@@ -5739,7 +5848,7 @@ is designed to provide communications between nodes in a
 cluster.
 
 To configure the system to prevent the <code>tipc</code>
-kernel module from being loaded, add the following line to a file in the directory <code>/etc/modprobe.d</code>:
+kernel module from being loaded, add the following line to the file <code>/etc/modprobe.d/tipc.conf</code>:
 <pre>install tipc /bin/true</pre>
 </td>
 </tr>
@@ -5832,7 +5941,7 @@ To properly set the permissions of <code>/boot/System.map-*</code>, run the comm
 </td>
 </tr>
 <tr>
-<td></td>
+<td>CCE-91175-0</td>
 <td>Ensure All SGID Executables Are Authorized</td>
 <td>The SGID (set group id) bit should be set only on files that were
 installed via authorized means. A straightforward means of identifying
@@ -5846,7 +5955,7 @@ the software should be considered an approved package on the system.
 Any SGID file not deployed through an RPM will be flagged for further review.</td>
 </tr>
 <tr>
-<td></td>
+<td>CCE-91174-3</td>
 <td>Ensure All SUID Executables Are Authorized</td>
 <td>The SUID (set user id) bit should be set only on files that were
 installed via authorized means. A straightforward means of identifying
@@ -6394,7 +6503,7 @@ The <code>autofs</code> service can be disabled with the following command:
 <td>Disable Mounting of cramfs</td>
 <td>
 To configure the system to prevent the <code>cramfs</code>
-kernel module from being loaded, add the following line to a file in the directory <code>/etc/modprobe.d</code>:
+kernel module from being loaded, add the following line to the file <code>/etc/modprobe.d/cramfs.conf</code>:
 <pre>install cramfs /bin/true</pre>
 This effectively prevents usage of this uncommon filesystem.
 
@@ -6408,7 +6517,7 @@ decompress the image.</td>
 <td>Disable Mounting of freevxfs</td>
 <td>
 To configure the system to prevent the <code>freevxfs</code>
-kernel module from being loaded, add the following line to a file in the directory <code>/etc/modprobe.d</code>:
+kernel module from being loaded, add the following line to the file <code>/etc/modprobe.d/freevxfs.conf</code>:
 <pre>install freevxfs /bin/true</pre>
 This effectively prevents usage of this uncommon filesystem.</td>
 </tr>
@@ -6417,7 +6526,7 @@ This effectively prevents usage of this uncommon filesystem.</td>
 <td>Disable Mounting of hfs</td>
 <td>
 To configure the system to prevent the <code>hfs</code>
-kernel module from being loaded, add the following line to a file in the directory <code>/etc/modprobe.d</code>:
+kernel module from being loaded, add the following line to the file <code>/etc/modprobe.d/hfs.conf</code>:
 <pre>install hfs /bin/true</pre>
 This effectively prevents usage of this uncommon filesystem.</td>
 </tr>
@@ -6426,7 +6535,7 @@ This effectively prevents usage of this uncommon filesystem.</td>
 <td>Disable Mounting of hfsplus</td>
 <td>
 To configure the system to prevent the <code>hfsplus</code>
-kernel module from being loaded, add the following line to a file in the directory <code>/etc/modprobe.d</code>:
+kernel module from being loaded, add the following line to the file <code>/etc/modprobe.d/hfsplus.conf</code>:
 <pre>install hfsplus /bin/true</pre>
 This effectively prevents usage of this uncommon filesystem.</td>
 </tr>
@@ -6435,7 +6544,7 @@ This effectively prevents usage of this uncommon filesystem.</td>
 <td>Disable Mounting of jffs2</td>
 <td>
 To configure the system to prevent the <code>jffs2</code>
-kernel module from being loaded, add the following line to a file in the directory <code>/etc/modprobe.d</code>:
+kernel module from being loaded, add the following line to the file <code>/etc/modprobe.d/jffs2.conf</code>:
 <pre>install jffs2 /bin/true</pre>
 This effectively prevents usage of this uncommon filesystem.</td>
 </tr>
@@ -6444,7 +6553,7 @@ This effectively prevents usage of this uncommon filesystem.</td>
 <td>Disable Mounting of squashfs</td>
 <td>
 To configure the system to prevent the <code>squashfs</code>
-kernel module from being loaded, add the following line to a file in the directory <code>/etc/modprobe.d</code>:
+kernel module from being loaded, add the following line to the file <code>/etc/modprobe.d/squashfs.conf</code>:
 <pre>install squashfs /bin/true</pre>
 This effectively prevents usage of this uncommon filesystem.
 
@@ -6458,7 +6567,7 @@ to first decompress the image.</td>
 <td>Disable Mounting of udf</td>
 <td>
 To configure the system to prevent the <code>udf</code>
-kernel module from being loaded, add the following line to a file in the directory <code>/etc/modprobe.d</code>:
+kernel module from being loaded, add the following line to the file <code>/etc/modprobe.d/udf.conf</code>:
 <pre>install udf /bin/true</pre>
 This effectively prevents usage of this uncommon filesystem.
 
@@ -6475,7 +6584,7 @@ writing DVDs and newer optical disc formats.</td>
 to prevent automatic loading of the USB storage driver.
 
 To configure the system to prevent the <code>usb-storage</code>
-kernel module from being loaded, add the following line to a file in the directory <code>/etc/modprobe.d</code>:
+kernel module from being loaded, add the following line to the file <code>/etc/modprobe.d/usb-storage.conf</code>:
 <pre>install usb-storage /bin/true</pre>
 This will prevent the <code>modprobe</code> program from loading the <code>usb-storage</code>
 module, but will not prevent an administrator (or another program) from using the
@@ -6486,7 +6595,7 @@ module, but will not prevent an administrator (or another program) from using th
 <td>Disable Mounting of vFAT filesystems</td>
 <td>
 To configure the system to prevent the <code>vfat</code>
-kernel module from being loaded, add the following line to a file in the directory <code>/etc/modprobe.d</code>:
+kernel module from being loaded, add the following line to the file <code>/etc/modprobe.d/vfat.conf</code>:
 <pre>install vfat /bin/true</pre>
 This effectively prevents usage of this uncommon filesystem.
 
@@ -6753,8 +6862,11 @@ To make sure that the setting is persistent, add the following line to a file in
 <td>Enable ExecShield via sysctl</td>
 <td>By default on SUSE Linux Enterprise 15 64-bit systems, ExecShield is
 enabled and can only be disabled if the hardware does not support
-ExecShield or is disabled in <code>/etc/default/grub</code>. For
-SUSE Linux Enterprise 15  32-bit systems, <code>sysctl</code> can be used to enable
+ExecShield or is disabled in <code>/etc/default/grub</code>.
+
+
+
+For SUSE Linux Enterprise 15  32-bit systems, <code>sysctl</code> can be used to enable
 ExecShield.</td>
 </tr>
 <tr>
@@ -7234,7 +7346,7 @@ option time-offset</pre>
 </td>
 </tr>
 <tr>
-<td></td>
+<td>CCE-85759-9</td>
 <td>Uninstall DHCP Server Package</td>
 <td>If the system does not need to act as a DHCP server,
 the dhcp package can be uninstalled.
@@ -7377,6 +7489,16 @@ The openldap-servers package is not installed by default on a SUSE Linux Enterpr
 system. It is needed only by the OpenLDAP server, not by the
 clients which use LDAP for authentication. If the system is not
 intended for use as an LDAP Server it should be removed.</td>
+</tr>
+<tr>
+<td>CCE-85761-5</td>
+<td>Uninstall Sendmail Package</td>
+<td>Sendmail is not the default mail transfer agent and is
+not installed by default.
+The <code>sendmail</code> package can be removed with the following command:
+<pre>
+$ sudo zypper remove sendmail</pre>
+</td>
 </tr>
 <tr>
 <td></td>
@@ -7700,7 +7822,7 @@ If there exist services which might be affected and access to them should not be
 modify the <code>/etc/hosts.allow</code> file appropriately before performing the remediation.</td>
 </tr>
 <tr>
-<td></td>
+<td>CCE-91159-4</td>
 <td>Remove NIS Client</td>
 <td>The Network Information Service (NIS), formerly known as Yellow Pages,
 is a client-server directory service protocol used to distribute system configuration
@@ -7708,7 +7830,7 @@ files. The NIS client (<code>ypbind</code>) was used to bind a system to an NIS 
 and receive the distributed configuration files.</td>
 </tr>
 <tr>
-<td></td>
+<td>CCE-91160-2</td>
 <td>Uninstall ypserv Package</td>
 <td>The <code>ypserv</code> package can be removed with the following command:
 <pre>
@@ -7724,7 +7846,7 @@ $ sudo zypper remove rsh-server</pre>
 </td>
 </tr>
 <tr>
-<td></td>
+<td>CCE-85760-7</td>
 <td>Uninstall rsh Package</td>
 <td>
 The <code>rsh</code> package contains the client commands
@@ -7847,6 +7969,14 @@ via the following command:
 The <code>rexec</code> socket can be disabled with the following command:
 <pre>$ sudo systemctl mask --now rexec.socket</pre>
 </td>
+</tr>
+<tr>
+<td>CCE-91158-6</td>
+<td>Remove tftp Daemon</td>
+<td>Trivial File Transfer Protocol (TFTP) is a simple file transfer protocol,
+typically used to automatically transfer configuration or boot files between systems.
+TFTP does not support authentication and can be easily hacked. The package
+<code>tftp</code> is a client program that allows for connections to a <code>tftp</code> server.</td>
 </tr>
 <tr>
 <td></td>
