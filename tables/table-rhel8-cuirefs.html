@@ -3820,10 +3820,13 @@ the SSH server is being used but denied by the firewall, this exception should
 be added to the firewall configuration.
 <br /><br />
 
-To configure <code>firewalld</code> to allow access, run the following command(s):
 
 
-<code>firewall-cmd --permanent --add-service=ssh</code>
+To configure <code>firewalld</code> to allow <code>ssh</code> access, run the following command(s):
+<pre>firewall-cmd --permanent --add-service=ssh</pre>
+
+Then run the following command to load the newly created rule(s):
+<pre>firewall-cmd --reload</pre>
   </td>
   <td xml:lang="en-US">
 If inbound SSH connections are expected, adding a firewall rule exception
@@ -4739,7 +4742,7 @@ prior to the audit daemon, add the argument <tt>audit=1</tt> to the default
 GRUB 2 command line for the Linux operating system.
 To ensure that <tt>audit=1</tt> is added as a kernel command line
 argument to newly installed kernels, add <tt>audit=1</tt> to the
-default Grub2 command line for Linux operating systems.  Modify the line within
+default Grub2 command line for Linux operating systems. Modify the line within
 <tt>/etc/default/grub</tt> as shown below:
 <pre>GRUB_CMDLINE_LINUX="... audit=1 ..."</pre>
 Run the following command to update command line for already installed kernels:<pre># grubby --update-kernel=ALL --args="audit=1"</pre>
