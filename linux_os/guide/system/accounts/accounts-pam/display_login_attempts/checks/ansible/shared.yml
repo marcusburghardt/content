@@ -1,0 +1,14 @@
+- name: "{{{ rule_title }}}"
+  hosts: all
+  vars:
+    pam_lastlog_path: |-
+      {%- if ansible_facts['distribution'] == 'Debian' or ansible_facts['distribution'] == 'Suse' -%}
+      /etc/pam.d/login
+      {%- else -%}
+      /etc/pam.d/postlogin
+      {%- endif -%}
+  tasks:
+    {{{ ansible_check_file_content(rule_title, rule_id,
+        '{{ pam_lastlog_path }}',
+        "^\s*session\s+.*\s+pam_lastlog\.so\s+(?!.*\ssilent\s).*\sshowfailed\s.*$")
+    }}}
