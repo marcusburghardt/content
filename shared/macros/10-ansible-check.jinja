@@ -63,7 +63,7 @@
 
 
 {{#
-  Macro used to show the overall result of a file existence check.
+  Macro used to show the result of a file existence check.
 
 :param rule_title: The rule title to be included in Ansible tasks names.
 :rule_title msg: str
@@ -74,15 +74,16 @@
 
 #}}
 {{%- macro ansible_check_file_existence_result(rule_title, rule_id, filepath) -%}}
-    - name: "{{{ rule_title }}} - Overall Assessment for {{{ filepath }}} Existence"
+    - name: "{{{ rule_title }}} - Assessment for {{{ filepath }}} Existence"
       ansible.builtin.debug:
         msg:
           - "File existence:      {{ assert_{{{ rule_id }}}_file_existence.msg | default('ERROR') }}"
+          - "Final Result:        {{ assert_{{{ rule_id }}}_final_result.msg | default('ERROR') }}"
 {{%- endmacro -%}}
 
 
 {{#
-  Macro used to show the overall result of a file content check.
+  Macro used to show the result of a file content check.
 
 :param rule_title: The rule title to be included in Ansible tasks names.
 :rule_title msg: str
@@ -93,17 +94,18 @@
 
 #}}
 {{%- macro ansible_check_file_content_result(rule_title, rule_id, filepath) -%}}
-    - name: "{{{ rule_title }}} - Overall Assessment for Parameters in {{{ filepath }}}"
+    - name: "{{{ rule_title }}} - Assessment for Parameters in {{{ filepath }}}"
       ansible.builtin.debug:
         msg:
           - "File existence:      {{ assert_{{{ rule_id }}}_file_existence.msg | default('ERROR') }}"
           - "Content existence:   {{ assert_{{{ rule_id }}}_content_match.msg | default('SKIPPED') }}"
           - "Content duplication: {{ assert_{{{ rule_id }}}_content_duplication.msg | default('SKIPPED') }}"
+          - "Final Result:        {{ assert_{{{ rule_id }}}_final_result.msg | default('ERROR') }}"
 {{%- endmacro -%}}
 
 
 {{#
-  Macro used to show the overall result of a file content value check.
+  Macro used to show the result of a file content value check.
 
 :param rule_title: The rule title to be included in Ansible tasks names.
 :rule_title msg: str
@@ -114,13 +116,45 @@
 
 #}}
 {{%- macro ansible_check_file_content_value_result(rule_title, rule_id, filepath) -%}}
-    - name: "{{{ rule_title }}} - Overall Assessment for Parameters Values in {{{ filepath }}}"
+    - name: "{{{ rule_title }}} - Assessment for Parameters Values in {{{ filepath }}}"
       ansible.builtin.debug:
         msg:
           - "File existence:      {{ assert_{{{ rule_id }}}_file_existence.msg | default('ERROR') }}"
           - "Content existence:   {{ assert_{{{ rule_id }}}_content_match.msg | default('SKIPPED') }}"
           - "Content duplication: {{ assert_{{{ rule_id }}}_content_duplication.msg | default('SKIPPED') }}"
           - "Correct values:      {{ (assert_{{{ rule_id }}}_parameters_values.results | default([]) | map(attribute='msg') | join(', ') if assert_{{{ rule_id }}}_parameters_values.results is defined else 'SKIPPED') }}"
+          - "Final Result:        {{ assert_{{{ rule_id }}}_final_result.msg | default('ERROR') }}"
+{{%- endmacro -%}}
+
+
+{{#
+  Macro used to assert the final result all checks. In many cases it is only necessary to know the
+  final result, for example during an auditing process. In other situations, for example, when the
+  system administrator is hardening the system it is very useful to know more specifically which
+  checks are failing. This macro will show the final result based on the combination of a list of
+  checks.
+
+:param rule_title: The rule title to be included in Ansible tasks names.
+:rule_title msg: str
+:param rule_id: The rule id used in registers.
+:rule_id msg: str
+:param registers: The list of registers to be considered for the final assessment.
+:registers msg: list
+
+#}}
+{{%- macro ansible_check_assert_final_result(rule_title, rule_id, registers) -%}}
+    - name: "{{{ rule_title }}} - Define the Final Assessment for {{{ rule_id }}}"
+      ansible.builtin.assert:
+        that:
+          {{%- for register in registers %}}
+          - {{{ register }}}.msg in ["PASS", "SKIPPED"]
+          {{%- endfor %}}
+        fail_msg: FAIL
+        success_msg: PASS
+        quiet: true
+      register: assert_{{{ rule_id }}}_final_result
+      changed_when: false
+      failed_when: false
 {{%- endmacro -%}}
 
 
@@ -135,7 +169,7 @@
 :filepath msg: str
 
 #}}
-{{%- macro ansible_check_file_existence_tasks(rule_title, rule_id, filepath) -%}}
+{{%- macro ansible_check_assert_file_existence_tasks(rule_title, rule_id, filepath) -%}}
     - name: "{{{ rule_title }}} - Check File Existence: {{{ filepath }}}"
       ansible.builtin.stat:
         path: "{{{ filepath }}}"
@@ -154,7 +188,86 @@
 
 
 {{#
-  Macro with tasks used to assert the content of a file present in the system.
+  Macro with task used to assert that a match exists in the content of a file present
+  in the system.
+
+:param rule_title: The rule title to be included in Ansible tasks names.
+:rule_title msg: str
+:param rule_id: The rule id used in registers.
+:rule_id msg: str
+:param filepath: The absolute path of the file checked for its content.
+:filepath msg: str
+
+#}}
+{{%- macro ansible_check_assert_file_content_match(rule_title, rule_id, filepath) -%}}
+        - name: "{{{ rule_title }}} - Assert the Content Matches At Least Once in File: {{{ filepath }}}"
+          ansible.builtin.assert:
+            that:
+              - {{{ rule_id }}}_extracted_values | length > 0
+            fail_msg: FAIL
+            success_msg: PASS
+            quiet: true
+          register: assert_{{{ rule_id }}}_content_match
+          changed_when: false
+          failed_when: false
+{{%- endmacro -%}}
+
+
+{{#
+  Macro with task used to assert duplication in the content of a file present in the system.
+
+:param rule_title: The rule title to be included in Ansible tasks names.
+:rule_title msg: str
+:param rule_id: The rule id used in registers.
+:rule_id msg: str
+:param filepath: The absolute path of the file checked for its content.
+:filepath msg: str
+
+#}}
+{{%- macro ansible_check_assert_file_content_duplication(rule_title, rule_id, filepath) -%}}
+        - name: "{{{ rule_title }}} - Assert the Content Matches Only Once in File: {{{ filepath }}}"
+          ansible.builtin.assert:
+            that:
+              - {{{ rule_id }}}_extracted_values | length == 1
+            fail_msg: FAIL ({{ {{{ rule_id }}}_extracted_values | length }} matches)
+            success_msg: PASS
+            quiet: true
+          register: assert_{{{ rule_id }}}_content_duplication
+          changed_when: false
+          failed_when: false
+{{%- endmacro -%}}
+
+
+{{#
+  Macro with task used to assert parameter value in the content of a file present in the system.
+
+:param rule_title: The rule title to be included in Ansible tasks names.
+:rule_title msg: str
+:param rule_id: The rule id used in registers.
+:rule_id msg: str
+:param comparison_operation: Operation to compare the current value with the expected value.
+:filepath msg: str
+:param expected_value: The expected value to be set in a parameter found by search_regex.
+:filepath msg: str
+
+#}}
+{{%- macro ansible_check_assert_file_content_parameters_values(rule_title, rule_id, comparison_operation, expected_value) -%}}
+        - name: "{{{ rule_title }}} - Assert That Found Values Are: {{{ comparison_operation }}} {{{ expected_value }}}"
+          ansible.builtin.assert:
+            that:
+              - item {{{ comparison_operation }}} {{{ expected_value | replace("{{", "") | replace("}}", "") }}}
+            fail_msg: FAIL ({{item}})
+            success_msg: PASS ({{item}})
+            quiet: true
+          loop: "{{ {{{ rule_id }}}_extracted_values | map('int') }}"
+          register: assert_{{{ rule_id }}}_parameters_values
+          changed_when: false
+          failed_when: false
+{{%- endmacro -%}}
+
+
+{{#
+  Macro with tasks used to extract the content of a file present in the system.
 
 :param rule_title: The rule title to be included in Ansible tasks names.
 :rule_title msg: str
@@ -183,85 +296,6 @@
 
 
 {{#
-  Macro with tasks used to assert that a match exists in the content of a file present
-  in the system.
-
-:param rule_title: The rule title to be included in Ansible tasks names.
-:rule_title msg: str
-:param rule_id: The rule id used in registers.
-:rule_id msg: str
-:param filepath: The absolute path of the file checked for its content.
-:filepath msg: str
-
-#}}
-{{%- macro ansible_check_file_content_match(rule_title, rule_id, filepath) -%}}
-        - name: "{{{ rule_title }}} - Assert the Content Matches At Least Once in File: {{{ filepath }}}"
-          ansible.builtin.assert:
-            that:
-              - {{{ rule_id }}}_extracted_values | length > 0
-            fail_msg: FAIL
-            success_msg: PASS
-            quiet: true
-          register: assert_{{{ rule_id }}}_content_match
-          changed_when: false
-          failed_when: false
-{{%- endmacro -%}}
-
-
-{{#
-  Macro with tasks used to assert duplication in the content of a file present in the system.
-
-:param rule_title: The rule title to be included in Ansible tasks names.
-:rule_title msg: str
-:param rule_id: The rule id used in registers.
-:rule_id msg: str
-:param filepath: The absolute path of the file checked for its content.
-:filepath msg: str
-
-#}}
-{{%- macro ansible_check_file_content_duplication(rule_title, rule_id, filepath) -%}}
-        - name: "{{{ rule_title }}} - Assert the Content Matches Only Once in File: {{{ filepath }}}"
-          ansible.builtin.assert:
-            that:
-              - {{{ rule_id }}}_extracted_values | length == 1
-            fail_msg: FAIL ({{ {{{ rule_id }}}_extracted_values | length }} matches)
-            success_msg: PASS
-            quiet: true
-          register: assert_{{{ rule_id }}}_content_duplication
-          changed_when: false
-          failed_when: false
-{{%- endmacro -%}}
-
-
-{{#
-  Macro with tasks used to assert parameter value in the content of a file present in the system.
-
-:param rule_title: The rule title to be included in Ansible tasks names.
-:rule_title msg: str
-:param rule_id: The rule id used in registers.
-:rule_id msg: str
-:param comparison_operation: Operation to compare the current value with the expected value.
-:filepath msg: str
-:param expected_value: The expected value to be set in a parameter found by search_regex.
-:filepath msg: str
-
-#}}
-{{%- macro ansible_check_file_content_parameters_values(rule_title, rule_id, comparison_operation, expected_value) -%}}
-        - name: "{{{ rule_title }}} - Assert That Found Values Are: {{{ comparison_operation }}} {{{ expected_value }}}"
-          ansible.builtin.assert:
-            that:
-              - item {{{ comparison_operation }}} {{{ expected_value | replace("{{", "") | replace("}}", "") }}}
-            fail_msg: FAIL ({{item}})
-            success_msg: PASS ({{item}})
-            quiet: true
-          loop: "{{ {{{ rule_id }}}_extracted_values | map('int') }}"
-          register: assert_{{{ rule_id }}}_parameters_values
-          changed_when: false
-          failed_when: false
-{{%- endmacro -%}}
-
-
-{{#
   Macro with tasks used to assert the content of a file present in the system.
 
 :param rule_title: The rule title to be included in Ansible tasks names.
@@ -275,7 +309,7 @@
 
 #}}
 {{%- macro ansible_check_file_content_tasks(rule_title, rule_id, filepath, search_regex) -%}}
-    {{{ ansible_check_file_existence_tasks(rule_title, rule_id, filepath) }}}
+    {{{ ansible_check_assert_file_existence_tasks(rule_title, rule_id, filepath) }}}
 
     {{{ ansible_check_file_content_extract(rule_title, rule_id, filepath, search_regex) }}}
 
@@ -283,9 +317,9 @@
       when:
         - check_result_{{{ rule_id }}}_filestat.stat.exists
       block:
-        {{{ ansible_check_file_content_match(rule_title, rule_id, filepath) }}}
+        {{{ ansible_check_assert_file_content_match(rule_title, rule_id, filepath) }}}
 
-        {{{ ansible_check_file_content_duplication(rule_title, rule_id, filepath) }}}
+        {{{ ansible_check_assert_file_content_duplication(rule_title, rule_id, filepath) }}}
 {{%- endmacro -%}}
 
 
@@ -307,7 +341,7 @@
 
 #}}
 {{%- macro ansible_check_file_content_values_tasks(rule_title, rule_id, filepath, search_regex, comparison_operation, expected_value) -%}}
-    {{{ ansible_check_file_existence_tasks(rule_title, rule_id, filepath) }}}
+    {{{ ansible_check_assert_file_existence_tasks(rule_title, rule_id, filepath) }}}
 
     {{{ ansible_check_file_content_extract(rule_title, rule_id, filepath, search_regex) }}}
 
@@ -315,11 +349,11 @@
       when:
         - check_result_{{{ rule_id }}}_filestat.stat.exists
       block:
-        {{{ ansible_check_file_content_match(rule_title, rule_id, filepath) }}}
+        {{{ ansible_check_assert_file_content_match(rule_title, rule_id, filepath) }}}
 
-        {{{ ansible_check_file_content_duplication(rule_title, rule_id, filepath) }}}
+        {{{ ansible_check_assert_file_content_duplication(rule_title, rule_id, filepath) }}}
 
-        {{{ ansible_check_file_content_parameters_values(rule_title, rule_id, comparison_operation, expected_value) }}}
+        {{{ ansible_check_assert_file_content_parameters_values(rule_title, rule_id, comparison_operation, expected_value) }}}
 {{%- endmacro -%}}
 
 
@@ -335,7 +369,10 @@
 
 #}}
 {{%- macro ansible_check_file_existence(rule_title, rule_id, filepath) -%}}
-    {{{ ansible_check_file_existence_tasks(rule_title, rule_id, filepath) }}}
+    {{{ ansible_check_assert_file_existence_tasks(rule_title, rule_id, filepath) }}}
+
+    {{{ ansible_check_assert_final_result(rule_title, rule_id, [
+      "assert_"~ rule_id ~"_file_existence"]) }}}
 
     {{{ ansible_check_file_existence_result(rule_title, rule_id, filepath) }}}
 {{%- endmacro -%}}
@@ -356,6 +393,11 @@
 #}}
 {{%- macro ansible_check_file_content(rule_title, rule_id, filepath, search_regex) -%}}
     {{{ ansible_check_file_content_tasks(rule_title, rule_id, filepath, search_regex) }}}
+
+    {{{ ansible_check_assert_final_result(rule_title, rule_id, [
+      "assert_"~ rule_id ~"_file_existence",
+      "assert_"~ rule_id ~"_content_match",
+      "assert_"~ rule_id ~"_content_duplication"]) }}}
 
     {{{ ansible_check_file_content_result(rule_title, rule_id, filepath) }}}
 {{%- endmacro -%}}
