@@ -153,7 +153,10 @@
         success_msg: PASS
         quiet: true
       register: assert_{{{ rule_id }}}_final_result
-      changed_when: false
+      changed_when:
+        {{%- for register in registers %}}
+        - {{{ register }}}.msg not in ["PASS", "SKIPPED"]
+        {{%- endfor %}}
       failed_when: false
 {{%- endmacro -%}}
 
@@ -182,7 +185,8 @@
         success_msg: PASS
         quiet: true
       register: assert_{{{ rule_id }}}_file_existence
-      changed_when: false
+      changed_when:
+        - assert_{{{ rule_id }}}_file_existence.msg not in ["PASS", "SKIPPED"]
       failed_when: false
 {{%- endmacro -%}}
 
@@ -208,7 +212,8 @@
             success_msg: PASS
             quiet: true
           register: assert_{{{ rule_id }}}_content_match
-          changed_when: false
+          changed_when:
+            - assert_{{{ rule_id }}}_content_match.msg not in ["PASS", "SKIPPED"]
           failed_when: false
 {{%- endmacro -%}}
 
@@ -233,7 +238,8 @@
             success_msg: PASS
             quiet: true
           register: assert_{{{ rule_id }}}_content_duplication
-          changed_when: false
+          changed_when:
+            - assert_{{{ rule_id }}}_content_duplication.msg not in ["PASS", "SKIPPED"]
           failed_when: false
 {{%- endmacro -%}}
 
@@ -261,7 +267,8 @@
             quiet: true
           loop: "{{ {{{ rule_id }}}_extracted_values | map('int') }}"
           register: assert_{{{ rule_id }}}_parameters_values
-          changed_when: false
+          changed_when:
+            - assert_{{{ rule_id }}}_parameters_values.msg not in ["PASS", "SKIPPED"]
           failed_when: false
 {{%- endmacro -%}}
 
