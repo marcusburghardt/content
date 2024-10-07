@@ -274,6 +274,33 @@
 
 
 {{#
+  Macro used to extract the content of a file present in the system and save it in a register
+  encoded in base64. It is encoded in base64 because this is the standard for the
+  ansible.builtin.slurp module, which is part of the core modules and designed to only collect
+  information. Other modules could be used to extract file content, but they would also be capable
+  to make modifications, even if accidantaly. slurp module mitigates this risk.
+
+:param rule_title: The rule title to be included in Ansible tasks names.
+:rule_title msg: str
+:param rule_id: The rule id used in registers.
+:rule_id msg: str
+:param filepath: The absolute path of the file checked for its content.
+:filepath msg: str
+
+#}}
+{{%- macro ansible_check_file_content_extract(rule_title, rule_id, filepath) -%}}
+    - name: "{{{ rule_title }}} - Extract File Content: {{{ filepath }}}"
+      when:
+        - check_result_{{{ rule_id }}}_filestat.stat.exists
+      block:
+        - name: "{{{ rule_title }}} - Read File Content and Store it Encoded in Base64: {{{ filepath }}}"
+          ansible.builtin.slurp:
+            src: "{{{ filepath }}}"
+          register: check_result_{{{ rule_id }}}_filecontent
+{{%- endmacro -%}}
+
+
+{{#
   Macro with tasks used to extract the content of a file present in the system.
 
 :param rule_title: The rule title to be included in Ansible tasks names.
@@ -286,15 +313,10 @@
 :filepath msg: str
 
 #}}
-{{%- macro ansible_check_file_content_extract(rule_title, rule_id, filepath, search_regex) -%}}
-    - name: "{{{ rule_title }}} - Extract File Content: {{{ filepath }}}"
-      when:
-        - check_result_{{{ rule_id }}}_filestat.stat.exists
-      block:
-        - name: "{{{ rule_title }}} - Read File Content and Store it Encoded in Base64: {{{ filepath }}}"
-          ansible.builtin.slurp:
-            src: "{{{ filepath }}}"
-          register: check_result_{{{ rule_id }}}_filecontent
+{{%- macro ansible_check_file_content_select(rule_title, rule_id, filepath, search_regex) -%}}
+    {{{ ansible_check_assert_file_existence_tasks(rule_title, rule_id, filepath) }}}
+
+    {{{ ansible_check_file_content_extract(rule_title, rule_id, filepath) }}}
 
         - name: '{{{ rule_title }}} - Search for Content Using Regex and Save as a Fact: "{{{ search_regex }}}"'
           ansible.builtin.set_fact:
@@ -316,9 +338,7 @@
 
 #}}
 {{%- macro ansible_check_file_content_tasks(rule_title, rule_id, filepath, search_regex) -%}}
-    {{{ ansible_check_assert_file_existence_tasks(rule_title, rule_id, filepath) }}}
-
-    {{{ ansible_check_file_content_extract(rule_title, rule_id, filepath, search_regex) }}}
+    {{{ ansible_check_file_content_select(rule_title, rule_id, filepath, search_regex) }}}
 
     - name: "{{{ rule_title }}} - Assert Content Existence and Duplication in File: {{{ filepath }}}"
       when:
@@ -350,7 +370,7 @@
 {{%- macro ansible_check_file_content_values_tasks(rule_title, rule_id, filepath, search_regex, comparison_operation, expected_value) -%}}
     {{{ ansible_check_assert_file_existence_tasks(rule_title, rule_id, filepath) }}}
 
-    {{{ ansible_check_file_content_extract(rule_title, rule_id, filepath, search_regex) }}}
+    {{{ ansible_check_file_content_select(rule_title, rule_id, filepath, search_regex) }}}
 
     - name: "{{{ rule_title }}} - Assert Content Existence, Duplication and Value in File: {{{ filepath }}}"
       when:
@@ -431,4 +451,29 @@
     {{{ ansible_check_file_content_values_tasks(rule_title, rule_id, filepath, search_regex, comparison_operation, expected_value) }}}
 
     {{{ ansible_check_file_content_value_result(rule_title, rule_id, filepath) }}}
+{{%- endmacro -%}}
+
+{{#
+  Macro used to enumerate the local interactive users.
+
+:param rule_title: The rule title to be included in Ansible tasks names.
+:rule_title msg: str
+:param rule_id: The rule id used in registers.
+:rule_id msg: str
+
+#}}
+{{%- macro ansible_check_enumerate_interactive_users(rule_title, rule_id) -%}}
+    - name: "{{{ rule_title }}} - Read /etc/passwd File Content and Store it Encoded in Base64"
+      ansible.builtin.slurp:
+        src: "/etc/passwd"
+      register: check_result_passwd_filecontent
+
+    - name: '{{{ rule_title }}} - Parse /etc/passwd and Store User Lines as a Dictionary"'
+      ansible.builtin.set_fact:
+        local_users_dict: '{{ check_result_passwd_filecontent["content"] | b64decode | splitlines | map('split', ':') | map('slice', 0, 7) | map('list') }}'
+
+    - name: '{{{ rule_title }}} - Debug'
+      ansible.builtin.debug:
+        var: local_users_dict
+
 {{%- endmacro -%}}
