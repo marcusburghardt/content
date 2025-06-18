@@ -7,7 +7,7 @@ levels:
   - id: minimal
   - id: intermediary
     inherits_from:
-    - minimal
+      - minimal
   - id: enhanced
     inherits_from:
     - intermediary
